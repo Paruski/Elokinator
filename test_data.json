@@ -1,0 +1,1231 @@
+{
+  "test_name": "Chess Level Estimator",
+  "version": "1.0",
+  "date": "2026-07-09",
+  "positions": [
+    {
+      "id": 1,
+      "fen": "rnbqkbnr/ppp2ppp/4p3/3p4/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3",
+      "turn": "white",
+      "description": "Gambito de Dama rehusado: 1.d4 d5 2.c4 e6 — las blancas eligen continuación",
+      "n_observations": 38,
+      "n_bands": 5,
+      "total_by_band": {
+        "Muy_inferior": 0,
+        "Inferior": 1,
+        "Normal_bajo": 5,
+        "Normal_alto": 5,
+        "Superior": 4,
+        "Muy_superior": 10,
+        "Excepcional": 13
+      },
+      "moves": {
+        "b1c3": {
+          "san": "Nc3",
+          "cp_loss": 0.0,
+          "quality": 1.0
+        },
+        "c1f4": {
+          "san": "Bf4",
+          "cp_loss": 29.0,
+          "quality": 0.0
+        },
+        "c4d5": {
+          "san": "cxd5",
+          "cp_loss": 7.0,
+          "quality": 0.759
+        },
+        "e2e3": {
+          "san": "e3",
+          "cp_loss": 22.0,
+          "quality": 0.241
+        },
+        "g1f3": {
+          "san": "Nf3",
+          "cp_loss": 1.0,
+          "quality": 0.966
+        }
+      },
+      "reference_by_band": [
+        {
+          "band": "Inferior",
+          "low_rating": 700,
+          "high_rating": 1100,
+          "mean_cp_loss": 17.0,
+          "n_players": 1
+        },
+        {
+          "band": "Normal_bajo",
+          "low_rating": 1100,
+          "high_rating": 1500,
+          "mean_cp_loss": 8.2,
+          "n_players": 5
+        },
+        {
+          "band": "Normal_alto",
+          "low_rating": 1500,
+          "high_rating": 1900,
+          "mean_cp_loss": 16.4,
+          "n_players": 5
+        },
+        {
+          "band": "Superior",
+          "low_rating": 1900,
+          "high_rating": 2300,
+          "mean_cp_loss": 6.25,
+          "n_players": 4
+        },
+        {
+          "band": "Muy_superior",
+          "low_rating": 2300,
+          "high_rating": 2650,
+          "mean_cp_loss": 0.0,
+          "n_players": 10
+        },
+        {
+          "band": "Excepcional",
+          "low_rating": 2650,
+          "high_rating": 9999,
+          "mean_cp_loss": 0.0,
+          "n_players": 13
+        }
+      ],
+      "best_cp_loss": 0.0,
+      "worst_cp_loss": 29.0
+    },
+    {
+      "id": 2,
+      "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+      "turn": "white",
+      "description": "Apertura abierta: 1.e4 e5 — blancas deciden su desarrollo",
+      "n_observations": 522,
+      "n_bands": 7,
+      "total_by_band": {
+        "Muy_inferior": 129,
+        "Inferior": 122,
+        "Normal_bajo": 89,
+        "Normal_alto": 63,
+        "Superior": 57,
+        "Muy_superior": 27,
+        "Excepcional": 35
+      },
+      "moves": {
+        "a2a3": {
+          "san": "a3",
+          "cp_loss": 57.0,
+          "quality": 0.671
+        },
+        "b1c3": {
+          "san": "Nc3",
+          "cp_loss": 31.0,
+          "quality": 0.821
+        },
+        "b2b3": {
+          "san": "b3",
+          "cp_loss": 99.0,
+          "quality": 0.428
+        },
+        "c2c3": {
+          "san": "c3",
+          "cp_loss": 82.0,
+          "quality": 0.526
+        },
+        "c2c4": {
+          "san": "c4",
+          "cp_loss": 98.0,
+          "quality": 0.434
+        },
+        "d1e2": {
+          "san": "Qe2",
+          "cp_loss": 85.0,
+          "quality": 0.509
+        },
+        "d1f3": {
+          "san": "Qf3",
+          "cp_loss": 63.0,
+          "quality": 0.636
+        },
+        "d1h5": {
+          "san": "Qh5",
+          "cp_loss": 55.0,
+          "quality": 0.682
+        },
+        "d2d3": {
+          "san": "d3",
+          "cp_loss": 50.0,
+          "quality": 0.711
+        },
+        "d2d4": {
+          "san": "d4",
+          "cp_loss": 56.0,
+          "quality": 0.676
+        },
+        "f1b5": {
+          "san": "Bb5",
+          "cp_loss": 62.0,
+          "quality": 0.642
+        },
+        "f1c4": {
+          "san": "Bc4",
+          "cp_loss": 34.0,
+          "quality": 0.803
+        },
+        "f2f3": {
+          "san": "f3",
+          "cp_loss": 113.0,
+          "quality": 0.347
+        },
+        "f2f4": {
+          "san": "f4",
+          "cp_loss": 97.0,
+          "quality": 0.439
+        },
+        "g1f3": {
+          "san": "Nf3",
+          "cp_loss": 0.0,
+          "quality": 1.0
+        },
+        "g2g3": {
+          "san": "g3",
+          "cp_loss": 94.0,
+          "quality": 0.457
+        },
+        "g2g4": {
+          "san": "g4",
+          "cp_loss": 173.0,
+          "quality": 0.0
+        }
+      },
+      "reference_by_band": [
+        {
+          "band": "Muy_inferior",
+          "low_rating": 0,
+          "high_rating": 700,
+          "mean_cp_loss": 29.55,
+          "n_players": 129
+        },
+        {
+          "band": "Inferior",
+          "low_rating": 700,
+          "high_rating": 1100,
+          "mean_cp_loss": 17.84,
+          "n_players": 122
+        },
+        {
+          "band": "Normal_bajo",
+          "low_rating": 1100,
+          "high_rating": 1500,
+          "mean_cp_loss": 14.25,
+          "n_players": 89
+        },
+        {
+          "band": "Normal_alto",
+          "low_rating": 1500,
+          "high_rating": 1900,
+          "mean_cp_loss": 11.98,
+          "n_players": 63
+        },
+        {
+          "band": "Superior",
+          "low_rating": 1900,
+          "high_rating": 2300,
+          "mean_cp_loss": 11.84,
+          "n_players": 57
+        },
+        {
+          "band": "Muy_superior",
+          "low_rating": 2300,
+          "high_rating": 2650,
+          "mean_cp_loss": 6.37,
+          "n_players": 27
+        },
+        {
+          "band": "Excepcional",
+          "low_rating": 2650,
+          "high_rating": 9999,
+          "mean_cp_loss": 1.2,
+          "n_players": 35
+        }
+      ],
+      "best_cp_loss": 0.0,
+      "worst_cp_loss": 173.0
+    },
+    {
+      "id": 3,
+      "fen": "rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2",
+      "turn": "white",
+      "description": "Defensa Alekhine: 1.e4 Cf6 — blancas deciden cómo presionar",
+      "n_observations": 32,
+      "n_bands": 6,
+      "total_by_band": {
+        "Muy_inferior": 10,
+        "Inferior": 3,
+        "Normal_bajo": 5,
+        "Normal_alto": 3,
+        "Superior": 2,
+        "Muy_superior": 4,
+        "Excepcional": 5
+      },
+      "moves": {
+        "b1c3": {
+          "san": "Nc3",
+          "cp_loss": 44.0,
+          "quality": 0.751
+        },
+        "d1f3": {
+          "san": "Qf3",
+          "cp_loss": 131.0,
+          "quality": 0.26
+        },
+        "d2d3": {
+          "san": "d3",
+          "cp_loss": 75.0,
+          "quality": 0.576
+        },
+        "e4e5": {
+          "san": "e5",
+          "cp_loss": 0.0,
+          "quality": 1.0
+        },
+        "f1b5": {
+          "san": "Bb5",
+          "cp_loss": 177.0,
+          "quality": 0.0
+        },
+        "f1c4": {
+          "san": "Bc4",
+          "cp_loss": 154.0,
+          "quality": 0.13
+        },
+        "f1d3": {
+          "san": "Bd3",
+          "cp_loss": 81.0,
+          "quality": 0.542
+        },
+        "g1f3": {
+          "san": "Nf3",
+          "cp_loss": 125.0,
+          "quality": 0.294
+        }
+      },
+      "reference_by_band": [
+        {
+          "band": "Muy_inferior",
+          "low_rating": 0,
+          "high_rating": 700,
+          "mean_cp_loss": 89.7,
+          "n_players": 10
+        },
+        {
+          "band": "Inferior",
+          "low_rating": 700,
+          "high_rating": 1100,
+          "mean_cp_loss": 112.67,
+          "n_players": 3
+        },
+        {
+          "band": "Normal_bajo",
+          "low_rating": 1100,
+          "high_rating": 1500,
+          "mean_cp_loss": 28.8,
+          "n_players": 5
+        },
+        {
+          "band": "Normal_alto",
+          "low_rating": 1500,
+          "high_rating": 1900,
+          "mean_cp_loss": 0.0,
+          "n_players": 3
+        },
+        {
+          "band": "Superior",
+          "low_rating": 1900,
+          "high_rating": 2300,
+          "mean_cp_loss": 0.0,
+          "n_players": 2
+        },
+        {
+          "band": "Muy_superior",
+          "low_rating": 2300,
+          "high_rating": 2650,
+          "mean_cp_loss": 12.0,
+          "n_players": 4
+        },
+        {
+          "band": "Excepcional",
+          "low_rating": 2650,
+          "high_rating": 9999,
+          "mean_cp_loss": 9.6,
+          "n_players": 5
+        }
+      ],
+      "best_cp_loss": 0.0,
+      "worst_cp_loss": 177.0
+    },
+    {
+      "id": 4,
+      "fen": "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+      "turn": "white",
+      "description": "Defensa Siciliana: 1.e4 c5 — la respuesta más popular a 1.e4",
+      "n_observations": 212,
+      "n_bands": 7,
+      "total_by_band": {
+        "Muy_inferior": 9,
+        "Inferior": 9,
+        "Normal_bajo": 27,
+        "Normal_alto": 34,
+        "Superior": 31,
+        "Muy_superior": 48,
+        "Excepcional": 54
+      },
+      "moves": {
+        "b1a3": {
+          "san": "Na3",
+          "cp_loss": 36.0,
+          "quality": 0.7
+        },
+        "b1c3": {
+          "san": "Nc3",
+          "cp_loss": 0.0,
+          "quality": 1.0
+        },
+        "b2b4": {
+          "san": "b4",
+          "cp_loss": 87.0,
+          "quality": 0.275
+        },
+        "c2c3": {
+          "san": "c3",
+          "cp_loss": 3.0,
+          "quality": 0.975
+        },
+        "d1f3": {
+          "san": "Qf3",
+          "cp_loss": 120.0,
+          "quality": 0.0
+        },
+        "d1h5": {
+          "san": "Qh5",
+          "cp_loss": 91.0,
+          "quality": 0.242
+        },
+        "d2d4": {
+          "san": "d4",
+          "cp_loss": 20.0,
+          "quality": 0.833
+        },
+        "e4e5": {
+          "san": "e5",
+          "cp_loss": 61.0,
+          "quality": 0.492
+        },
+        "f1c4": {
+          "san": "Bc4",
+          "cp_loss": 38.0,
+          "quality": 0.683
+        },
+        "f1e2": {
+          "san": "Be2",
+          "cp_loss": 47.0,
+          "quality": 0.608
+        },
+        "f2f4": {
+          "san": "f4",
+          "cp_loss": 44.0,
+          "quality": 0.633
+        },
+        "g1e2": {
+          "san": "Ne2",
+          "cp_loss": 10.0,
+          "quality": 0.917
+        },
+        "g1f3": {
+          "san": "Nf3",
+          "cp_loss": 0.0,
+          "quality": 1.0
+        },
+        "g2g3": {
+          "san": "g3",
+          "cp_loss": 45.0,
+          "quality": 0.625
+        }
+      },
+      "reference_by_band": [
+        {
+          "band": "Muy_inferior",
+          "low_rating": 0,
+          "high_rating": 700,
+          "mean_cp_loss": 24.0,
+          "n_players": 9
+        },
+        {
+          "band": "Inferior",
+          "low_rating": 700,
+          "high_rating": 1100,
+          "mean_cp_loss": 38.0,
+          "n_players": 9
+        },
+        {
+          "band": "Normal_bajo",
+          "low_rating": 1100,
+          "high_rating": 1500,
+          "mean_cp_loss": 23.89,
+          "n_players": 27
+        },
+        {
+          "band": "Normal_alto",
+          "low_rating": 1500,
+          "high_rating": 1900,
+          "mean_cp_loss": 10.38,
+          "n_players": 34
+        },
+        {
+          "band": "Superior",
+          "low_rating": 1900,
+          "high_rating": 2300,
+          "mean_cp_loss": 16.45,
+          "n_players": 31
+        },
+        {
+          "band": "Muy_superior",
+          "low_rating": 2300,
+          "high_rating": 2650,
+          "mean_cp_loss": 9.6,
+          "n_players": 48
+        },
+        {
+          "band": "Excepcional",
+          "low_rating": 2650,
+          "high_rating": 9999,
+          "mean_cp_loss": 7.85,
+          "n_players": 54
+        }
+      ],
+      "best_cp_loss": 0.0,
+      "worst_cp_loss": 120.0
+    },
+    {
+      "id": 5,
+      "fen": "rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2",
+      "turn": "white",
+      "description": "Defensa India de Rey: 1.d4 Cf6 — la defensa estrella contra 1.d4",
+      "n_observations": 179,
+      "n_bands": 6,
+      "total_by_band": {
+        "Muy_inferior": 2,
+        "Inferior": 11,
+        "Normal_bajo": 15,
+        "Normal_alto": 19,
+        "Superior": 22,
+        "Muy_superior": 50,
+        "Excepcional": 60
+      },
+      "moves": {
+        "b1c3": {
+          "san": "Nc3",
+          "cp_loss": 24.0,
+          "quality": 0.774
+        },
+        "c1f4": {
+          "san": "Bf4",
+          "cp_loss": 6.0,
+          "quality": 0.943
+        },
+        "c1g5": {
+          "san": "Bg5",
+          "cp_loss": 17.0,
+          "quality": 0.84
+        },
+        "c2c3": {
+          "san": "c3",
+          "cp_loss": 22.0,
+          "quality": 0.792
+        },
+        "c2c4": {
+          "san": "c4",
+          "cp_loss": 0.0,
+          "quality": 1.0
+        },
+        "d4d5": {
+          "san": "d5",
+          "cp_loss": 58.0,
+          "quality": 0.453
+        },
+        "e2e3": {
+          "san": "e3",
+          "cp_loss": 24.0,
+          "quality": 0.774
+        },
+        "e2e4": {
+          "san": "e4",
+          "cp_loss": 106.0,
+          "quality": 0.0
+        },
+        "f2f3": {
+          "san": "f3",
+          "cp_loss": 96.0,
+          "quality": 0.094
+        },
+        "f2f4": {
+          "san": "f4",
+          "cp_loss": 94.0,
+          "quality": 0.113
+        },
+        "g1f3": {
+          "san": "Nf3",
+          "cp_loss": 21.0,
+          "quality": 0.802
+        },
+        "h2h3": {
+          "san": "h3",
+          "cp_loss": 42.0,
+          "quality": 0.604
+        }
+      },
+      "reference_by_band": [
+        {
+          "band": "Muy_inferior",
+          "low_rating": 0,
+          "high_rating": 700,
+          "mean_cp_loss": 34.0,
+          "n_players": 2
+        },
+        {
+          "band": "Inferior",
+          "low_rating": 700,
+          "high_rating": 1100,
+          "mean_cp_loss": 31.82,
+          "n_players": 11
+        },
+        {
+          "band": "Normal_bajo",
+          "low_rating": 1100,
+          "high_rating": 1500,
+          "mean_cp_loss": 10.93,
+          "n_players": 15
+        },
+        {
+          "band": "Normal_alto",
+          "low_rating": 1500,
+          "high_rating": 1900,
+          "mean_cp_loss": 11.84,
+          "n_players": 19
+        },
+        {
+          "band": "Superior",
+          "low_rating": 1900,
+          "high_rating": 2300,
+          "mean_cp_loss": 6.73,
+          "n_players": 22
+        },
+        {
+          "band": "Muy_superior",
+          "low_rating": 2300,
+          "high_rating": 2650,
+          "mean_cp_loss": 7.16,
+          "n_players": 50
+        },
+        {
+          "band": "Excepcional",
+          "low_rating": 2650,
+          "high_rating": 9999,
+          "mean_cp_loss": 6.88,
+          "n_players": 60
+        }
+      ],
+      "best_cp_loss": 0.0,
+      "worst_cp_loss": 106.0
+    },
+    {
+      "id": 6,
+      "fen": "rnbqkbnr/ppp1pppp/3p4/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2",
+      "turn": "white",
+      "description": "Apertura 1.d4 d6: posición poco común que filtra nivel temprano",
+      "n_observations": 29,
+      "n_bands": 6,
+      "total_by_band": {
+        "Muy_inferior": 1,
+        "Inferior": 3,
+        "Normal_bajo": 5,
+        "Normal_alto": 3,
+        "Superior": 6,
+        "Muy_superior": 8,
+        "Excepcional": 3
+      },
+      "moves": {
+        "b1c3": {
+          "san": "Nc3",
+          "cp_loss": 3.0,
+          "quality": 0.946
+        },
+        "c1f4": {
+          "san": "Bf4",
+          "cp_loss": 17.0,
+          "quality": 0.696
+        },
+        "c2c4": {
+          "san": "c4",
+          "cp_loss": 3.0,
+          "quality": 0.946
+        },
+        "e2e3": {
+          "san": "e3",
+          "cp_loss": 30.0,
+          "quality": 0.464
+        },
+        "e2e4": {
+          "san": "e4",
+          "cp_loss": 4.0,
+          "quality": 0.929
+        },
+        "f2f4": {
+          "san": "f4",
+          "cp_loss": 56.0,
+          "quality": 0.0
+        },
+        "g1f3": {
+          "san": "Nf3",
+          "cp_loss": 0.0,
+          "quality": 1.0
+        }
+      },
+      "reference_by_band": [
+        {
+          "band": "Muy_inferior",
+          "low_rating": 0,
+          "high_rating": 700,
+          "mean_cp_loss": 37.0,
+          "n_players": 1
+        },
+        {
+          "band": "Inferior",
+          "low_rating": 700,
+          "high_rating": 1100,
+          "mean_cp_loss": 25.33,
+          "n_players": 3
+        },
+        {
+          "band": "Normal_bajo",
+          "low_rating": 1100,
+          "high_rating": 1500,
+          "mean_cp_loss": 46.6,
+          "n_players": 5
+        },
+        {
+          "band": "Normal_alto",
+          "low_rating": 1500,
+          "high_rating": 1900,
+          "mean_cp_loss": 37.33,
+          "n_players": 3
+        },
+        {
+          "band": "Superior",
+          "low_rating": 1900,
+          "high_rating": 2300,
+          "mean_cp_loss": 22.0,
+          "n_players": 6
+        },
+        {
+          "band": "Muy_superior",
+          "low_rating": 2300,
+          "high_rating": 2650,
+          "mean_cp_loss": 8.62,
+          "n_players": 8
+        },
+        {
+          "band": "Excepcional",
+          "low_rating": 2650,
+          "high_rating": 9999,
+          "mean_cp_loss": 4.0,
+          "n_players": 3
+        }
+      ],
+      "best_cp_loss": 0.0,
+      "worst_cp_loss": 56.0
+    },
+    {
+      "id": 7,
+      "fen": "rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+      "turn": "white",
+      "description": "Defensa Francesa: 1.e4 e6 — decisión crítica de desarrollo",
+      "n_observations": 127,
+      "n_bands": 7,
+      "total_by_band": {
+        "Muy_inferior": 10,
+        "Inferior": 12,
+        "Normal_bajo": 26,
+        "Normal_alto": 20,
+        "Superior": 24,
+        "Muy_superior": 16,
+        "Excepcional": 19
+      },
+      "moves": {
+        "b1c3": {
+          "san": "Nc3",
+          "cp_loss": 21.0,
+          "quality": 0.777
+        },
+        "b2b3": {
+          "san": "b3",
+          "cp_loss": 75.0,
+          "quality": 0.202
+        },
+        "c2c4": {
+          "san": "c4",
+          "cp_loss": 48.0,
+          "quality": 0.489
+        },
+        "d1e2": {
+          "san": "Qe2",
+          "cp_loss": 60.0,
+          "quality": 0.362
+        },
+        "d1f3": {
+          "san": "Qf3",
+          "cp_loss": 89.0,
+          "quality": 0.053
+        },
+        "d1g4": {
+          "san": "Qg4",
+          "cp_loss": 94.0,
+          "quality": 0.0
+        },
+        "d2d3": {
+          "san": "d3",
+          "cp_loss": 44.0,
+          "quality": 0.532
+        },
+        "d2d4": {
+          "san": "d4",
+          "cp_loss": 0.0,
+          "quality": 1.0
+        },
+        "e4e5": {
+          "san": "e5",
+          "cp_loss": 74.0,
+          "quality": 0.213
+        },
+        "f1c4": {
+          "san": "Bc4",
+          "cp_loss": 71.0,
+          "quality": 0.245
+        },
+        "f2f4": {
+          "san": "f4",
+          "cp_loss": 54.0,
+          "quality": 0.426
+        },
+        "g1f3": {
+          "san": "Nf3",
+          "cp_loss": 21.0,
+          "quality": 0.777
+        }
+      },
+      "reference_by_band": [
+        {
+          "band": "Muy_inferior",
+          "low_rating": 0,
+          "high_rating": 700,
+          "mean_cp_loss": 23.2,
+          "n_players": 10
+        },
+        {
+          "band": "Inferior",
+          "low_rating": 700,
+          "high_rating": 1100,
+          "mean_cp_loss": 41.75,
+          "n_players": 12
+        },
+        {
+          "band": "Normal_bajo",
+          "low_rating": 1100,
+          "high_rating": 1500,
+          "mean_cp_loss": 21.23,
+          "n_players": 26
+        },
+        {
+          "band": "Normal_alto",
+          "low_rating": 1500,
+          "high_rating": 1900,
+          "mean_cp_loss": 15.5,
+          "n_players": 20
+        },
+        {
+          "band": "Superior",
+          "low_rating": 1900,
+          "high_rating": 2300,
+          "mean_cp_loss": 13.96,
+          "n_players": 24
+        },
+        {
+          "band": "Muy_superior",
+          "low_rating": 2300,
+          "high_rating": 2650,
+          "mean_cp_loss": 13.12,
+          "n_players": 16
+        },
+        {
+          "band": "Excepcional",
+          "low_rating": 2650,
+          "high_rating": 9999,
+          "mean_cp_loss": 5.05,
+          "n_players": 19
+        }
+      ],
+      "best_cp_loss": 0.0,
+      "worst_cp_loss": 94.0
+    },
+    {
+      "id": 8,
+      "fen": "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+      "turn": "white",
+      "description": "Defensa Caro-Kann: 1.e4 c6 — posición fundamental temprana",
+      "n_observations": 116,
+      "n_bands": 7,
+      "total_by_band": {
+        "Muy_inferior": 13,
+        "Inferior": 12,
+        "Normal_bajo": 15,
+        "Normal_alto": 15,
+        "Superior": 15,
+        "Muy_superior": 21,
+        "Excepcional": 25
+      },
+      "moves": {
+        "b1c3": {
+          "san": "Nc3",
+          "cp_loss": 7.0,
+          "quality": 0.923
+        },
+        "b2b4": {
+          "san": "b4",
+          "cp_loss": 91.0,
+          "quality": 0.0
+        },
+        "c2c4": {
+          "san": "c4",
+          "cp_loss": 19.0,
+          "quality": 0.791
+        },
+        "d1f3": {
+          "san": "Qf3",
+          "cp_loss": 43.0,
+          "quality": 0.527
+        },
+        "d1h5": {
+          "san": "Qh5",
+          "cp_loss": 84.0,
+          "quality": 0.077
+        },
+        "d2d3": {
+          "san": "d3",
+          "cp_loss": 18.0,
+          "quality": 0.802
+        },
+        "d2d4": {
+          "san": "d4",
+          "cp_loss": 0.0,
+          "quality": 1.0
+        },
+        "f1c4": {
+          "san": "Bc4",
+          "cp_loss": 88.0,
+          "quality": 0.033
+        },
+        "f2f4": {
+          "san": "f4",
+          "cp_loss": 26.0,
+          "quality": 0.714
+        },
+        "g1e2": {
+          "san": "Ne2",
+          "cp_loss": 45.0,
+          "quality": 0.505
+        },
+        "g1f3": {
+          "san": "Nf3",
+          "cp_loss": 15.0,
+          "quality": 0.835
+        }
+      },
+      "reference_by_band": [
+        {
+          "band": "Muy_inferior",
+          "low_rating": 0,
+          "high_rating": 700,
+          "mean_cp_loss": 31.46,
+          "n_players": 13
+        },
+        {
+          "band": "Inferior",
+          "low_rating": 700,
+          "high_rating": 1100,
+          "mean_cp_loss": 9.0,
+          "n_players": 12
+        },
+        {
+          "band": "Normal_bajo",
+          "low_rating": 1100,
+          "high_rating": 1500,
+          "mean_cp_loss": 15.4,
+          "n_players": 15
+        },
+        {
+          "band": "Normal_alto",
+          "low_rating": 1500,
+          "high_rating": 1900,
+          "mean_cp_loss": 14.73,
+          "n_players": 15
+        },
+        {
+          "band": "Superior",
+          "low_rating": 1900,
+          "high_rating": 2300,
+          "mean_cp_loss": 7.4,
+          "n_players": 15
+        },
+        {
+          "band": "Muy_superior",
+          "low_rating": 2300,
+          "high_rating": 2650,
+          "mean_cp_loss": 3.19,
+          "n_players": 21
+        },
+        {
+          "band": "Excepcional",
+          "low_rating": 2650,
+          "high_rating": 9999,
+          "mean_cp_loss": 2.4,
+          "n_players": 25
+        }
+      ],
+      "best_cp_loss": 0.0,
+      "worst_cp_loss": 91.0
+    },
+    {
+      "id": 9,
+      "fen": "rnbqkbnr/pp1p1ppp/4p3/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3",
+      "turn": "white",
+      "description": "Defensa Siciliana: 1.e4 c5 2.Cf3 — continuación principal",
+      "n_observations": 31,
+      "n_bands": 5,
+      "total_by_band": {
+        "Muy_inferior": 1,
+        "Inferior": 2,
+        "Normal_bajo": 6,
+        "Normal_alto": 4,
+        "Superior": 3,
+        "Muy_superior": 9,
+        "Excepcional": 6
+      },
+      "moves": {
+        "b1c3": {
+          "san": "Nc3",
+          "cp_loss": 42.0,
+          "quality": 0.475
+        },
+        "c2c3": {
+          "san": "c3",
+          "cp_loss": 21.0,
+          "quality": 0.738
+        },
+        "c2c4": {
+          "san": "c4",
+          "cp_loss": 40.0,
+          "quality": 0.5
+        },
+        "d2d3": {
+          "san": "d3",
+          "cp_loss": 29.0,
+          "quality": 0.637
+        },
+        "d2d4": {
+          "san": "d4",
+          "cp_loss": 0.0,
+          "quality": 1.0
+        },
+        "e4e5": {
+          "san": "e5",
+          "cp_loss": 79.0,
+          "quality": 0.012
+        },
+        "f1c4": {
+          "san": "Bc4",
+          "cp_loss": 64.0,
+          "quality": 0.2
+        },
+        "f3e5": {
+          "san": "Ne5",
+          "cp_loss": 80.0,
+          "quality": 0.0
+        },
+        "g2g3": {
+          "san": "g3",
+          "cp_loss": 45.0,
+          "quality": 0.438
+        }
+      },
+      "reference_by_band": [
+        {
+          "band": "Muy_inferior",
+          "low_rating": 0,
+          "high_rating": 700,
+          "mean_cp_loss": 39.0,
+          "n_players": 1
+        },
+        {
+          "band": "Inferior",
+          "low_rating": 700,
+          "high_rating": 1100,
+          "mean_cp_loss": 55.5,
+          "n_players": 2
+        },
+        {
+          "band": "Normal_bajo",
+          "low_rating": 1100,
+          "high_rating": 1500,
+          "mean_cp_loss": 32.83,
+          "n_players": 6
+        },
+        {
+          "band": "Normal_alto",
+          "low_rating": 1500,
+          "high_rating": 1900,
+          "mean_cp_loss": 24.75,
+          "n_players": 4
+        },
+        {
+          "band": "Superior",
+          "low_rating": 1900,
+          "high_rating": 2300,
+          "mean_cp_loss": 12.33,
+          "n_players": 3
+        },
+        {
+          "band": "Muy_superior",
+          "low_rating": 2300,
+          "high_rating": 2650,
+          "mean_cp_loss": 3.78,
+          "n_players": 9
+        },
+        {
+          "band": "Excepcional",
+          "low_rating": 2650,
+          "high_rating": 9999,
+          "mean_cp_loss": 14.33,
+          "n_players": 6
+        }
+      ],
+      "best_cp_loss": 0.0,
+      "worst_cp_loss": 80.0
+    },
+    {
+      "id": 10,
+      "fen": "r1bqkbnr/pp1ppppp/2n5/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3",
+      "turn": "white",
+      "description": "Defensa Siciliana: 1.e4 c5 2.Cf3 Cc6 — rama clásica con Cc6",
+      "n_observations": 38,
+      "n_bands": 5,
+      "total_by_band": {
+        "Muy_inferior": 0,
+        "Inferior": 0,
+        "Normal_bajo": 3,
+        "Normal_alto": 9,
+        "Superior": 6,
+        "Muy_superior": 6,
+        "Excepcional": 14
+      },
+      "moves": {
+        "a2a3": {
+          "san": "a3",
+          "cp_loss": 50.0,
+          "quality": 0.39
+        },
+        "b1c3": {
+          "san": "Nc3",
+          "cp_loss": 14.0,
+          "quality": 0.829
+        },
+        "c2c3": {
+          "san": "c3",
+          "cp_loss": 21.0,
+          "quality": 0.744
+        },
+        "d2d3": {
+          "san": "d3",
+          "cp_loss": 60.0,
+          "quality": 0.268
+        },
+        "d2d4": {
+          "san": "d4",
+          "cp_loss": 0.0,
+          "quality": 1.0
+        },
+        "e4e5": {
+          "san": "e5",
+          "cp_loss": 82.0,
+          "quality": 0.0
+        },
+        "f1b5": {
+          "san": "Bb5",
+          "cp_loss": 0.0,
+          "quality": 1.0
+        },
+        "f1c4": {
+          "san": "Bc4",
+          "cp_loss": 30.0,
+          "quality": 0.634
+        }
+      },
+      "reference_by_band": [
+        {
+          "band": "Normal_bajo",
+          "low_rating": 1100,
+          "high_rating": 1500,
+          "mean_cp_loss": 24.33,
+          "n_players": 3
+        },
+        {
+          "band": "Normal_alto",
+          "low_rating": 1500,
+          "high_rating": 1900,
+          "mean_cp_loss": 23.78,
+          "n_players": 9
+        },
+        {
+          "band": "Superior",
+          "low_rating": 1900,
+          "high_rating": 2300,
+          "mean_cp_loss": 15.0,
+          "n_players": 6
+        },
+        {
+          "band": "Muy_superior",
+          "low_rating": 2300,
+          "high_rating": 2650,
+          "mean_cp_loss": 6.33,
+          "n_players": 6
+        },
+        {
+          "band": "Excepcional",
+          "low_rating": 2650,
+          "high_rating": 9999,
+          "mean_cp_loss": 3.71,
+          "n_players": 14
+        }
+      ],
+      "best_cp_loss": 0.0,
+      "worst_cp_loss": 82.0
+    }
+  ],
+  "bands": [
+    "Muy_inferior",
+    "Inferior",
+    "Normal_bajo",
+    "Normal_alto",
+    "Superior",
+    "Muy_superior",
+    "Excepcional"
+  ],
+  "method": "Score = 100 - mean(CP_loss). Bands weighted by distance. Two-pass estimation."
+}
