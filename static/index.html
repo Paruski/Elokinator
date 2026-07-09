@@ -133,7 +133,7 @@ const PIECES = {'wK':'♔','wQ':'♕','wR':'♖','wB':'♗','wN':'♘','wP':'♙
 let model = null, positions = null, currentPos = 0, selectedMoves = {};
 
 // ─── Tree inference ───────────────────────────────────────────────
-function predictTree(tree, x) {
+function rfTree(tree, x) {
   // tree: {nl, nr, f, t, v, nn} — children_left, children_right, feature, threshold, value, n_nodes
   let node = 0;
   while (node >= 0) {
@@ -147,7 +147,7 @@ function predictTree(tree, x) {
   return 0;
 }
 
-function predictGBM(features, modelJson) {
+function predictRF(features, modelJson) {
   // features: array of 10 CP loss values
   const nc = modelJson.nc, ne = modelJson.ne, lr = modelJson.lr;
   const scaler = modelJson.sc, trees = modelJson.trees;
@@ -156,7 +156,7 @@ function predictGBM(features, modelJson) {
   const x = features.map((v, i) => (v - scaler.m[i]) / scaler.s[i]);
   
   // Start from init
-  const raw = modelJson.init_raw.slice();  // copy init probabilities
+  // RandomForest: average class probs from all trees  // copy init probabilities
   
   // Add tree contributions (additive logistic regression)
   // For multiclass GBM: each tree contributes to its class's raw score
@@ -281,7 +281,7 @@ function submitResults() {
     }
 
     // Predict
-    const rawProbs = predictGBM(feats, model);
+    const rawProbs = predictRF(feats, model);
     const adjProbs = posteriorAdjust(rawProbs, model.pr, model.al);
     const predClass = adjProbs.indexOf(Math.max(...adjProbs));
     const predBand = BANDS[predClass];
