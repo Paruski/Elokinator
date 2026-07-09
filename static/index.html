@@ -88,7 +88,7 @@
   <p style="margin-bottom:14px;color:#aaa;font-size:0.9rem;line-height:1.5;">
     Te mostraremos <strong>10 posiciones</strong> de apertura.<br>
     En cada una, elige la jugada que <em>tú</em> harías.<br>
-    El modelo GradientBoosting (300 árboles) estimará tu nivel.
+    El modelo RandomForest (400 árboles) estimará tu nivel.
   </p>
   <p style="font-size:0.75rem;color:#666;margin-bottom:14px;">
     Entrenado con 1635 jugadores reales de Lichess blitz<br>
@@ -116,13 +116,13 @@
   <p class="subtitle" style="margin-bottom:10px;">Basado en tus 10 jugadas</p>
   <div id="result-content"></div>
   <button class="restart-btn" onclick="location.reload()">Volver a empezar</button>
-  <footer>GradientBoosting 300×7 árboles + ajuste Bayesiano<br>
-  Prior: distribución real de Lichess Blitz · <a href="https://github.com/Paruski/Elokinator" style="color:#4c8bf5;">GitHub</a></footer>
+  <footer>RandomForest 400 árboles · Prior: Lichess Blitz real<br>
+  <a href="https://github.com/Paruski/Elokinator" style="color:#4c8bf5;">GitHub</a></footer>
 </div>
 
 <script>
 // ═════════════════════════════════════════════════════════════════════
-// GRADIENT BOOSTING INFERENCE ENGINE (pure JS, no deps)
+// DATA
 // ═════════════════════════════════════════════════════════════════════
 
 const BANDS = ["Muy_inferior","Inferior","Normal_bajo","Normal_alto","Superior","Muy_superior","Excepcional"];
@@ -130,22 +130,22 @@ const BAND_NAMES = {"Muy_inferior":"Muy inferior (<700)","Inferior":"Inferior (7
 const BAND_MIDPOINTS = [350, 900, 1300, 1700, 2100, 2475, 2700];
 const PIECES = {'wK':'♔','wQ':'♕','wR':'♖','wB':'♗','wN':'♘','wP':'♙','bK':'♚','bQ':'♛','bR':'♜','bB':'♝','bN':'♞','bP':'♟'};
 
-let model = null, positions = null, currentPos = 0, selectedMoves = {};
+const POSITIONS = [
+  {"id":1,"turn":"white","fen":"rnbqkbnr/ppp2ppp/4p3/3p4/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3","description":"Gambito de Dama rehusado: 1.d4 d5 2.c4 e6","moves":{"b1c3":{"san":"Cc3","cp_loss":0.0},"g1f3":{"san":"Cf3","cp_loss":0.0},"c4d5":{"san":"cxd5","cp_loss":0.0},"e2e3":{"san":"e3","cp_loss":32.5},"c1f4":{"san":"Af4","cp_loss":54.0}}},
+  {"id":2,"turn":"white","fen":"rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2","description":"Apertura abierta: 1.e4 e5","moves":{"g1f3":{"san":"Cf3","cp_loss":0.0},"f1c4":{"san":"Ac4","cp_loss":22.2},"b1c3":{"san":"Cc3","cp_loss":21.0},"d1h5":{"san":"Dh5","cp_loss":41.3},"d2d3":{"san":"d3","cp_loss":32.5},"f1d3":{"san":"Ad3","cp_loss":40.2},"f1b5":{"san":"Ab5","cp_loss":0.0},"e4e5":{"san":"e5","cp_loss":73.5},"d2d4":{"san":"d4","cp_loss":20.3},"g2g3":{"san":"g3","cp_loss":33.4},"b2b3":{"san":"b3","cp_loss":33.2},"c2c4":{"san":"c4","cp_loss":41.2},"c2c3":{"san":"c3","cp_loss":36.1},"a2a3":{"san":"a3","cp_loss":63.0},"h2h3":{"san":"h3","cp_loss":55.6},"f2f4":{"san":"f4","cp_loss":87.6},"b1a3":{"san":"Ca3","cp_loss":60.0}}},
+  {"id":3,"turn":"white","fen":"rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2","description":"Defensa Alekhine: 1.e4 Cf6","moves":{"e4e5":{"san":"e5","cp_loss":0.0},"b1c3":{"san":"Cc3","cp_loss":0.0},"g1f3":{"san":"Cf3","cp_loss":35.4},"f1d3":{"san":"Ad3","cp_loss":47.7},"f1b5":{"san":"Ab5","cp_loss":96.5},"d2d4":{"san":"d4","cp_loss":46.6},"d2d3":{"san":"d3","cp_loss":91.0}}},
+  {"id":4,"turn":"white","fen":"rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2","description":"Defensa Siciliana: 1.e4 c5","moves":{"g1f3":{"san":"Cf3","cp_loss":18.3},"b1c3":{"san":"Cc3","cp_loss":0.0},"f1c4":{"san":"Ac4","cp_loss":20.1},"c2c3":{"san":"c3","cp_loss":23.8},"d2d4":{"san":"d4","cp_loss":33.8},"d2d3":{"san":"d3","cp_loss":21.4},"f1b5":{"san":"Ab5","cp_loss":43.0},"b2b4":{"san":"b4","cp_loss":112.7},"c2c4":{"san":"c4","cp_loss":52.6},"e4e5":{"san":"e5","cp_loss":109.4},"a2a3":{"san":"a3","cp_loss":42.1},"g2g3":{"san":"g3","cp_loss":59.0},"f2f4":{"san":"f4","cp_loss":79.9},"h2h3":{"san":"h3","cp_loss":62.2}}},
+  {"id":5,"turn":"white","fen":"rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2","description":"Defensa India de Rey: 1.d4 Cf6","moves":{"c2c4":{"san":"c4","cp_loss":0.0},"g1f3":{"san":"Cf3","cp_loss":0.0},"c1f4":{"san":"Af4","cp_loss":27.3},"b1c3":{"san":"Cc3","cp_loss":25.1},"e2e3":{"san":"e3","cp_loss":20.6},"b1d2":{"san":"Cd2","cp_loss":30.6},"e2e4":{"san":"e4","cp_loss":0.0},"c1g5":{"san":"Ag5","cp_loss":40.0},"g1h3":{"san":"Ch3","cp_loss":62.4},"c1d2":{"san":"Ad2","cp_loss":62.4},"a2a3":{"san":"a3","cp_loss":47.0},"f2f3":{"san":"f3","cp_loss":72.6}}},
+  {"id":6,"turn":"white","fen":"rnbqkbnr/ppp1pppp/3p4/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2","description":"Apertura 1.d4 d6 — posición poco común","moves":{"g1f3":{"san":"Cf3","cp_loss":0.0},"c2c4":{"san":"c4","cp_loss":0.0},"c1f4":{"san":"Af4","cp_loss":37.7},"e2e3":{"san":"e3","cp_loss":31.4},"e2e4":{"san":"e4","cp_loss":18.5},"b1c3":{"san":"Cc3","cp_loss":0.0},"b1d2":{"san":"Cd2","cp_loss":31.1}}},
+  {"id":7,"turn":"white","fen":"rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2","description":"Defensa Francesa: 1.e4 e6","moves":{"d2d4":{"san":"d4","cp_loss":0.0},"g1f3":{"san":"Cf3","cp_loss":0.0},"b1c3":{"san":"Cc3","cp_loss":28.8},"f1c4":{"san":"Ac4","cp_loss":25.0},"d2d3":{"san":"d3","cp_loss":30.6},"f1d3":{"san":"Ad3","cp_loss":37.5},"e4e5":{"san":"e5","cp_loss":17.4},"c2c4":{"san":"c4","cp_loss":32.6},"b2b3":{"san":"b3","cp_loss":65.0},"c2c3":{"san":"c3","cp_loss":37.7},"g2g3":{"san":"g3","cp_loss":22.3},"f2f4":{"san":"f4","cp_loss":39.3}}},
+  {"id":8,"turn":"white","fen":"rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2","description":"Defensa Caro-Kann: 1.e4 c6","moves":{"d2d4":{"san":"d4","cp_loss":0.0},"g1f3":{"san":"Cf3","cp_loss":12.2},"b1c3":{"san":"Cc3","cp_loss":0.0},"f1c4":{"san":"Ac4","cp_loss":15.0},"d2d3":{"san":"d3","cp_loss":24.2},"c2c4":{"san":"c4","cp_loss":21.5},"f1d3":{"san":"Ad3","cp_loss":39.1},"c2c3":{"san":"c3","cp_loss":7.0},"b2b3":{"san":"b3","cp_loss":32.5},"e4e5":{"san":"e5","cp_loss":29.3},"f2f4":{"san":"f4","cp_loss":41.4}}},
+  {"id":9,"turn":"white","fen":"rnbqkbnr/pp1p1ppp/4p3/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3","description":"Siciliana: 1.e4 c5 2.Cf3 — continuación principal","moves":{"d2d4":{"san":"d4","cp_loss":0.0},"c2c4":{"san":"c4","cp_loss":0.0},"b1c3":{"san":"Cc3","cp_loss":53.5},"f1c4":{"san":"Ac4","cp_loss":44.5},"c2c3":{"san":"c3","cp_loss":60.6},"f1b5":{"san":"Ab5","cp_loss":101.9},"d2d3":{"san":"d3","cp_loss":60.6},"b2b3":{"san":"b3","cp_loss":61.7},"g2g3":{"san":"g3","cp_loss":130.0}}},
+  {"id":10,"turn":"white","fen":"r1bqkbnr/pp1ppppp/2n5/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3","description":"Siciliana: 1.e4 c5 2.Cf3 Cc6 — rama clásica","moves":{"d2d4":{"san":"d4","cp_loss":3.4},"f1b5":{"san":"Ab5","cp_loss":0.0},"b1c3":{"san":"Cc3","cp_loss":17.8},"c2c3":{"san":"c3","cp_loss":32.5},"f1c4":{"san":"Ac4","cp_loss":37.3},"d2d3":{"san":"d3","cp_loss":20.4},"b2b3":{"san":"b3","cp_loss":20.6},"g2g3":{"san":"g3","cp_loss":49.7}}}
+];
 
-// ─── Tree inference ───────────────────────────────────────────────
-function rfTree(tree, x) {
-  // tree: {nl, nr, f, t, v, nn} — children_left, children_right, feature, threshold, value, n_nodes
-  let node = 0;
-  while (node >= 0) {
-    if (tree.f[node] === -2) return tree.v[node];  // leaf (feature -2 for sklearn leaves)
-    if (x[tree.f[node]] <= tree.t[node]) {
-      node = tree.nl[node];
-    } else {
-      node = tree.nr[node];
-    }
-  }
-  return 0;
-}
+// ═════════════════════════════════════════════════════════════════════
+// RANDOM FOREST INFERENCE ENGINE
+// ═════════════════════════════════════════════════════════════════════
 
 function predictRF(features, modelJson) {
   const nc = modelJson.nc, ne = modelJson.ne;
@@ -172,7 +172,24 @@ function posteriorAdjust(probs, prior, alpha) {
   return expPost.map(v => v / expPost.reduce((a, b) => a + b, 0));
 }
 
+// ═════════════════════════════════════════════════════════════════════
+// BOARD RENDERER
+// ═════════════════════════════════════════════════════════════════════
 
+function renderBoard(fen) {
+  const el = document.getElementById('board');
+  const rows = fen.split(' ')[0].split('/');
+  el.innerHTML = '';
+  for (let r = 0; r < 8; r++) {
+    let row = rows[r], col = 0;
+    for (let c = 0; c < row.length; c++) {
+      const ch = row[c];
+      if (ch >= '1' && ch <= '8') {
+        for (let e = 0; e < parseInt(ch); e++) {
+          const sq = document.createElement('div');
+          sq.className = 'sq ' + ((r + col) % 2 === 0 ? 'sq-light' : 'sq-dark');
+          el.appendChild(sq); col++;
+        }
       } else {
         const sq = document.createElement('div');
         const pColor = ch === ch.toUpperCase() ? 'w' : 'b';
@@ -184,28 +201,17 @@ function posteriorAdjust(probs, prior, alpha) {
   }
 }
 
-// ─── Test data ────────────────────────────────────────────────────
-const TEST_DATA = {
-  "positions": [
-    {"id":1,"turn":"white","fen":"rnbqkbnr/ppp2ppp/4p3/3p4/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3","description":"Gambito de Dama rehusado: 1.d4 d5 2.c4 e6","moves":{"b1c3":{"san":"Cc3","cp_loss":0.0},"g1f3":{"san":"Cf3","cp_loss":0.0},"c4d5":{"san":"cxd5","cp_loss":0.0},"e2e3":{"san":"e3","cp_loss":32.5},"c1f4":{"san":"Af4","cp_loss":54.0}}},
-    {"id":2,"turn":"white","fen":"rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2","description":"Apertura abierta: 1.e4 e5","moves":{"g1f3":{"san":"Cf3","cp_loss":0.0},"f1c4":{"san":"Ac4","cp_loss":22.2},"b1c3":{"san":"Cc3","cp_loss":21.0},"d1h5":{"san":"Dh5","cp_loss":41.3},"d2d3":{"san":"d3","cp_loss":32.5},"f1d3":{"san":"Ad3","cp_loss":40.2},"f1b5":{"san":"Ab5","cp_loss":0.0},"e4e5":{"san":"e5","cp_loss":73.5},"d2d4":{"san":"d4","cp_loss":20.3},"g2g3":{"san":"g3","cp_loss":33.4},"b2b3":{"san":"b3","cp_loss":33.2},"c2c4":{"san":"c4","cp_loss":41.2},"c2c3":{"san":"c3","cp_loss":36.1},"a2a3":{"san":"a3","cp_loss":63.0},"h2h3":{"san":"h3","cp_loss":55.6},"f2f4":{"san":"f4","cp_loss":87.6},"b1a3":{"san":"Ca3","cp_loss":60.0}}},
-    {"id":3,"turn":"white","fen":"rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2","description":"Defensa Alekhine: 1.e4 Cf6","moves":{"e4e5":{"san":"e5","cp_loss":0.0},"b1c3":{"san":"Cc3","cp_loss":0.0},"g1f3":{"san":"Cf3","cp_loss":35.4},"f1d3":{"san":"Ad3","cp_loss":47.7},"f1b5":{"san":"Ab5","cp_loss":96.5},"d2d4":{"san":"d4","cp_loss":46.6},"b1c3":{"san":"Cc3","cp_loss":0.0},"d2d3":{"san":"d3","cp_loss":91.0}}},
-    {"id":4,"turn":"white","fen":"rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2","description":"Defensa Siciliana: 1.e4 c5","moves":{"g1f3":{"san":"Cf3","cp_loss":18.3},"b1c3":{"san":"Cc3","cp_loss":0.0},"f1c4":{"san":"Ac4","cp_loss":20.1},"c2c3":{"san":"c3","cp_loss":23.8},"d2d4":{"san":"d4","cp_loss":33.8},"d2d3":{"san":"d3","cp_loss":21.4},"f1b5":{"san":"Ab5","cp_loss":43.0},"b2b4":{"san":"b4","cp_loss":112.7},"c2c4":{"san":"c4","cp_loss":52.6},"e4e5":{"san":"e5","cp_loss":109.4},"a2a3":{"san":"a3","cp_loss":42.1},"g2g3":{"san":"g3","cp_loss":59.0},"f2f4":{"san":"f4","cp_loss":79.9},"h2h3":{"san":"h3","cp_loss":62.2}}},
-    {"id":5,"turn":"white","fen":"rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2","description":"Defensa India de Rey: 1.d4 Cf6","moves":{"c2c4":{"san":"c4","cp_loss":0.0},"g1f3":{"san":"Cf3","cp_loss":0.0},"c1f4":{"san":"Af4","cp_loss":27.3},"b1c3":{"san":"Cc3","cp_loss":25.1},"e2e3":{"san":"e3","cp_loss":20.6},"b1d2":{"san":"Cd2","cp_loss":30.6},"e2e4":{"san":"e4","cp_loss":0.0},"c1g5":{"san":"Ag5","cp_loss":40.0},"g1h3":{"san":"Ch3","cp_loss":62.4},"c1d2":{"san":"Ad2","cp_loss":62.4},"a2a3":{"san":"a3","cp_loss":47.0},"f2f3":{"san":"f3","cp_loss":72.6}}},
-    {"id":6,"turn":"white","fen":"rnbqkbnr/ppp1pppp/3p4/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2","description":"Apertura 1.d4 d6 — posición poco común","moves":{"g1f3":{"san":"Cf3","cp_loss":0.0},"c2c4":{"san":"c4","cp_loss":0.0},"c1f4":{"san":"Af4","cp_loss":37.7},"e2e3":{"san":"e3","cp_loss":31.4},"e2e4":{"san":"e4","cp_loss":18.5},"b1c3":{"san":"Cc3","cp_loss":0.0},"b1d2":{"san":"Cd2","cp_loss":31.1}}},
-    {"id":7,"turn":"white","fen":"rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2","description":"Defensa Francesa: 1.e4 e6","moves":{"d2d4":{"san":"d4","cp_loss":0.0},"g1f3":{"san":"Cf3","cp_loss":0.0},"b1c3":{"san":"Cc3","cp_loss":28.8},"f1c4":{"san":"Ac4","cp_loss":25.0},"d2d3":{"san":"d3","cp_loss":30.6},"f1d3":{"san":"Ad3","cp_loss":37.5},"e4e5":{"san":"e5","cp_loss":17.4},"c2c4":{"san":"c4","cp_loss":32.6},"b2b3":{"san":"b3","cp_loss":65.0},"c2c3":{"san":"c3","cp_loss":37.7},"g2g3":{"san":"g3","cp_loss":22.3},"f2f4":{"san":"f4","cp_loss":39.3}}},
-    {"id":8,"turn":"white","fen":"rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2","description":"Defensa Caro-Kann: 1.e4 c6","moves":{"d2d4":{"san":"d4","cp_loss":0.0},"g1f3":{"san":"Cf3","cp_loss":12.2},"b1c3":{"san":"Cc3","cp_loss":0.0},"f1c4":{"san":"Ac4","cp_loss":15.0},"d2d3":{"san":"d3","cp_loss":24.2},"c2c4":{"san":"c4","cp_loss":21.5},"f1d3":{"san":"Ad3","cp_loss":39.1},"c2c3":{"san":"c3","cp_loss":7.0},"b2b3":{"san":"b3","cp_loss":32.5},"e4e5":{"san":"e5","cp_loss":29.3},"f2f4":{"san":"f4","cp_loss":41.4}}},
-    {"id":9,"turn":"white","fen":"rnbqkbnr/pp1p1ppp/4p3/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3","description":"Siciliana: 1.e4 c5 2.Cf3 — continuación principal","moves":{"d2d4":{"san":"d4","cp_loss":0.0},"c2c4":{"san":"c4","cp_loss":0.0},"b1c3":{"san":"Cc3","cp_loss":53.5},"f1c4":{"san":"Ac4","cp_loss":44.5},"c2c3":{"san":"c3","cp_loss":60.6},"f1b5":{"san":"Ab5","cp_loss":101.9},"d2d3":{"san":"d3","cp_loss":60.6},"b2b3":{"san":"b3","cp_loss":61.7},"g2g3":{"san":"g3","cp_loss":130.0}}},
-    {"id":10,"turn":"white","fen":"r1bqkbnr/pp1ppppp/2n5/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3","description":"Siciliana: 1.e4 c5 2.Cf3 Cc6 — rama clásica","moves":{"d2d4":{"san":"d4","cp_loss":3.4},"f1b5":{"san":"Ab5","cp_loss":0.0},"b1c3":{"san":"Cc3","cp_loss":17.8},"c2c3":{"san":"c3","cp_loss":32.5},"f1c4":{"san":"Ac4","cp_loss":37.3},"d2d3":{"san":"d3","cp_loss":20.4},"b2b3":{"san":"b3","cp_loss":20.6},"g2g3":{"san":"g3","cp_loss":49.7}}}
-  ],
-  "bands": BANDS
-};
-positions = TEST_DATA.positions;
+// ═════════════════════════════════════════════════════════════════════
+// APP STATE
+// ═════════════════════════════════════════════════════════════════════
 
-// ─── Position flow ─────────────────────────────────────────────────
+let model = null;
+let currentPos = 0;
+let selectedMoves = {};
+
 function updateProgress() {
   const bar = document.getElementById('progress-bar');
-  bar.innerHTML = positions.map((p, i) => {
+  bar.innerHTML = POSITIONS.map((p, i) => {
     let cls = 'dot';
     if (i === currentPos) cls += ' active';
     else if (selectedMoves[p.id]) cls += ' done';
@@ -214,7 +220,7 @@ function updateProgress() {
 }
 
 function renderMoves() {
-  const pos = positions[currentPos];
+  const pos = POSITIONS[currentPos];
   const container = document.getElementById('moves-container');
   container.innerHTML = '';
   const entries = Object.entries(pos.moves).sort((a, b) => a[1].san.localeCompare(b[1].san));
@@ -223,17 +229,26 @@ function renderMoves() {
     btn.className = 'move-btn';
     if (selectedMoves[pos.id] === uci) btn.classList.add('selected');
     btn.textContent = info.san;
-    btn.onclick = () => { selectedMoves[pos.id] = uci; renderMoves(); updateProgress(); document.getElementById('next-btn').style.display = 'inline-block'; };
+    btn.onclick = function() { selectMove(pos.id, uci); };
     container.appendChild(btn);
   }
 }
 
+function selectMove(posId, uci) {
+  selectedMoves[posId] = uci;
+  renderMoves();
+  updateProgress();
+  document.getElementById('next-btn').style.display = 'inline-block';
+}
+
 function showPosition() {
-  if (currentPos >= positions.length) { submitResults(); return; }
-  const pos = positions[currentPos];
-  document.getElementById('position-info').textContent = 'Posición ' + (currentPos+1) + ' de ' + positions.length;
+  if (currentPos >= POSITIONS.length) { submitResults(); return; }
+  const pos = POSITIONS[currentPos];
+  document.getElementById('position-info').textContent = 'Posici\u00f3n ' + (currentPos+1) + ' de ' + POSITIONS.length;
   document.getElementById('position-desc').textContent = pos.description || '';
-  renderBoard(pos.fen); renderMoves(); updateProgress();
+  renderBoard(pos.fen);
+  renderMoves();
+  updateProgress();
   document.getElementById('next-btn').style.display = selectedMoves[pos.id] ? 'inline-block' : 'none';
 }
 
@@ -242,26 +257,21 @@ function submitResults() {
   document.getElementById('loading').innerHTML = '<div class="spinner"></div><p>Analizando tus respuestas...</p>';
   document.getElementById('loading').style.display = 'block';
 
-  setTimeout(() => {
+  setTimeout(function() {
     const feats = [];
     for (let pid = 1; pid <= 10; pid++) {
       const uci = selectedMoves[pid];
-      const pos = positions.find(p => p.id === pid);
-      if (uci && pos && pos.moves[uci]) {
-        feats.push(pos.moves[uci].cp_loss);
-      } else {
-        feats.push(15.0);
-      }
+      const pos = POSITIONS.find(function(p) { return p.id === pid; });
+      if (uci && pos && pos.moves[uci]) { feats.push(pos.moves[uci].cp_loss); }
+      else { feats.push(15.0); }
     }
-
-    // Predict
     const rawProbs = predictRF(feats, model);
     const adjProbs = posteriorAdjust(rawProbs, model.pr, model.al);
-    const predClass = adjProbs.indexOf(Math.max(...adjProbs));
+    const predClass = adjProbs.indexOf(Math.max.apply(null, adjProbs));
     const predBand = BANDS[predClass];
     const confidence = adjProbs[predClass];
-    const expectedRating = Math.round(adjProbs.reduce((s, p, i) => s + p * BAND_MIDPOINTS[i], 0));
-    const meanCp = feats.filter(f => f !== 15.0).reduce((s, v) => s + v, 0) / feats.filter(f => f !== 15.0).length || 0;
+    const expectedRating = Math.round(adjProbs.reduce(function(s, p, i) { return s + p * BAND_MIDPOINTS[i]; }, 0));
+    const meanCp = feats.filter(function(f) { return f !== 15.0; }).reduce(function(s, v) { return s + v; }, 0) / Math.max(1, feats.filter(function(f) { return f !== 15.0; }).length);
 
     showResults(predBand, expectedRating, confidence, adjProbs, meanCp);
   }, 400);
@@ -270,33 +280,43 @@ function submitResults() {
 function showResults(band, rating, confidence, probs, meanCp) {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('result-panel').style.display = 'block';
-  let probHtml = '';
-  for (const b of BANDS) {
-    const pct = (probs[BANDS.indexOf(b)] * 100).toFixed(1);
+  var probHtml = '';
+  for (var i = 0; i < BANDS.length; i++) {
+    var b = BANDS[i];
+    var pct = (probs[i] * 100).toFixed(1);
     probHtml += '<div class="prob-row"><span class="prob-label">' + BAND_NAMES[b] + '</span><span class="prob-pct">' + pct + '%</span></div><div class="prob-bar"><div class="prob-fill" style="width:' + Math.max(pct, 1) + '%"></div></div>';
   }
   document.getElementById('result-content').innerHTML =
-    '<div class="band-result band-' + band + '"><div style="font-size:0.85rem;color:#888;">Tu banda estimada</div><div class="band-name" style="font-size:1.5rem;">' + BAND_NAMES[band] + '</div><div class="rating-est">Rating estimado: ~' + rating + ' Elo</div><div class="confidence">Confianza: ' + (confidence * 100).toFixed(0) + '% · CP loss medio: ' + meanCp.toFixed(1) + ' cp</div></div><div style="margin-top:14px;font-size:0.85rem;color:#aaa;text-align:left;"><strong>Distribución de probabilidad:</strong></div>' + probHtml;
+    '<div class="band-result band-' + band + '"><div style="font-size:0.85rem;color:#888;">Tu banda estimada</div><div class="band-name" style="font-size:1.5rem;">' + BAND_NAMES[band] + '</div><div class="rating-est">Rating estimado: ~' + rating + ' Elo</div><div class="confidence">Confianza: ' + (confidence * 100).toFixed(0) + '% · CP loss medio: ' + meanCp.toFixed(1) + ' cp</div></div><div style="margin-top:14px;font-size:0.85rem;color:#aaa;text-align:left;"><strong>Distribuci\u00f3n de probabilidad:</strong></div>' + probHtml;
 }
 
-// ─── Load model and start ──────────────────────────────────────────
-document.getElementById('start-btn').onclick = async () => {
+// ═════════════════════════════════════════════════════════════════════
+// START
+// ═════════════════════════════════════════════════════════════════════
+
+document.getElementById('start-btn').onclick = function() {
   document.getElementById('setup').style.display = 'none';
   document.getElementById('loading').style.display = 'block';
-  try {
-    const res = await fetch('model.json');
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    model = await res.json();
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('game-area').style.display = 'block';
-    currentPos = 0; showPosition();
-  } catch (e) {
-    document.getElementById('loading').innerHTML =
-      '<p class="err">Error al cargar modelo: ' + e.message + '</p><button class="restart-btn" onclick="location.reload()">Reintentar</button>';
-  }
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'model.json', true);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      model = JSON.parse(xhr.responseText);
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('game-area').style.display = 'block';
+      currentPos = 0;
+      showPosition();
+    } else {
+      document.getElementById('loading').innerHTML = '<p class="err">Error al cargar modelo: HTTP ' + xhr.status + '</p><button class="restart-btn" onclick="location.reload()">Reintentar</button>';
+    }
+  };
+  xhr.onerror = function() {
+    document.getElementById('loading').innerHTML = '<p class="err">Error de red al cargar modelo</p><button class="restart-btn" onclick="location.reload()">Reintentar</button>';
+  };
+  xhr.send();
 };
 
-document.getElementById('next-btn').onclick = () => { currentPos++; showPosition(); };
+document.getElementById('next-btn').onclick = function() { currentPos++; showPosition(); };
 </script>
 </body>
 </html>
