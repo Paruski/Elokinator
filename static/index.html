@@ -156,7 +156,7 @@ function predictGBM(features, modelJson) {
   const x = features.map((v, i) => (v - scaler.m[i]) / scaler.s[i]);
   
   // Start from init
-  const raw = modelJson.init.slice();  // copy init probabilities
+  const raw = modelJson.init_raw.slice();  // copy init probabilities
   
   // Add tree contributions (additive logistic regression)
   // For multiclass GBM: each tree contributes to its class's raw score
