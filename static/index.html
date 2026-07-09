@@ -3,100 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elokinator — estimador de nivel de ajedrez</title>
+<title>Elokinator - estimador de nivel de ajedrez</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♟</text></svg>">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #1a1a2e; color: #eee;
-    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
-    padding: 16px;
-  }
-  h1 { font-size: 1.5rem; margin-top: 8px; background: linear-gradient(135deg, #f0c27f, #fc5c7d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .subtitle { color: #888; font-size: 0.85rem; margin: 4px 0 16px; text-align: center; }
-  .panel {
-    background: #16213e; border-radius: 12px; padding: 20px; max-width: 480px; width: 100%;
-    text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-  }
-  #board { display: grid; grid-template-columns: repeat(8, 1fr); max-width: 400px; margin: 8px auto; border: 2px solid #3a3a5a; user-select: none; }
-  .sq { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: clamp(24px,5vw,42px); cursor: default; }
-  .sq-light { background: #f0d9b5; }
-  .sq-dark { background: #b58863; }
-  .sq-w { color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
-  .sq-b { color: #1a1a1a; text-shadow: 0 1px 2px rgba(255,255,255,0.2); }
-  .desc { font-size: 0.85rem; color: #7ec8e3; margin: 8px 0; font-style: italic; padding: 0 8px; min-height: 2.2em; }
-  .position-info { font-size: 0.85rem; color: #aaa; margin: 6px 0; }
-  .moves-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0; }
-  .move-btn {
-    background: #2a2a4a; border: 1px solid #3a3a5a; border-radius: 8px; padding: 10px 8px;
-    color: #ddd; font-size: 0.95rem; cursor: pointer; transition: all 0.15s; font-family: 'Segoe UI', monospace;
-  }
-  .move-btn:hover { background: #3a3a6a; border-color: #5a5a8a; transform: translateY(-1px); }
-  .move-btn.selected { background: #4c8bf5; border-color: #6aafff; color: white; box-shadow: 0 0 12px rgba(76,139,245,0.4); }
-  #progress-bar { display: flex; gap: 4px; justify-content: center; margin: 6px 0; flex-wrap: wrap; }
-  .dot {
-    width: 24px; height: 24px; border-radius: 50%; background: #2a2a4a; border: 2px solid #3a3a5a;
-    display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 700; color: #555;
-  }
-  .dot.active { border-color: #4c8bf5; background: #2a2a5a; color: #4c8bf5; }
-  .dot.done { border-color: #5ec96a; background: #1a3a2a; color: #5ec96a; }
-  button.primary {
-    background: linear-gradient(135deg, #4c8bf5, #6a5acd); border: none; color: white;
-    padding: 10px 24px; border-radius: 8px; font-size: 0.95rem; font-weight: 600;
-    cursor: pointer; transition: all 0.2s; margin-top: 10px;
-  }
-  button.primary:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(76,139,245,0.4); }
-  #next-btn { display: none; }
-  #loading { display: none; padding: 40px; color: #888; }
-  .spinner { border: 3px solid #2a2a4a; border-top: 3px solid #4c8bf5; border-radius: 50%; width: 36px; height: 36px; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  #result-panel { display: none; }
-  .band-result { background: linear-gradient(135deg, #1a1a3e, #2a1a4e); border-radius: 12px; padding: 18px; margin: 10px 0; }
-  .band-name { font-size: 1.3rem; font-weight: 800; margin: 6px 0; }
-  .rating-est { font-size: 1rem; color: #f0c27f; }
-  .confidence { font-size: 0.8rem; color: #888; margin-top: 3px; }
-  .prob-bar { height: 8px; border-radius: 4px; margin: 3px 0; background: #2a2a4a; overflow: hidden; }
-  .prob-fill { height: 100%; border-radius: 4px; }
-  .prob-row { display: flex; justify-content: space-between; font-size: 0.78rem; margin: 5px 0 1px; }
-  .prob-label { color: #aaa; text-align: left; }
-  .prob-pct { color: #ddd; font-weight: 600; }
-  .band-Muy_inferior .band-name { color: #e74c3c; }
-  .band-Inferior .band-name { color: #e67e22; }
-  .band-Normal_bajo .band-name { color: #f1c40f; }
-  .band-Normal_alto .band-name { color: #2ecc71; }
-  .band-Superior .band-name { color: #1abc9c; }
-  .band-Muy_superior .band-name { color: #3498db; }
-  .band-Excepcional .band-name { color: #9b59b6; }
-  .band-Muy_inferior .prob-fill { background: #e74c3c; }
-  .band-Inferior .prob-fill { background: #e67e22; }
-  .band-Normal_bajo .prob-fill { background: #f1c40f; }
-  .band-Normal_alto .prob-fill { background: #2ecc71; }
-  .band-Superior .prob-fill { background: #1abc9c; }
-  .band-Muy_superior .prob-fill { background: #3498db; }
-  .band-Excepcional .prob-fill { background: #9b59b6; }
-  .restart-btn { background: #2a2a4a; border: 1px solid #3a3a5a; color: #aaa; padding: 8px 18px; border-radius: 6px; cursor: pointer; margin-top: 10px; font-size: 0.85rem; }
-  .restart-btn:hover { background: #3a3a5a; color: #ddd; }
-  footer { margin-top: 16px; color: #555; font-size: 0.7rem; text-align: center; line-height: 1.3; }
-  .err { color: #e74c3c; font-size: 0.85rem; padding: 20px; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Segoe UI,system-ui,-apple-system,sans-serif;background:#1a1a2e;color:#eee;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px}
+h1{font-size:1.5rem;margin-top:8px;background:linear-gradient(135deg,#f0c27f,#fc5c7d);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{color:#888;font-size:.85rem;margin:4px 0 16px;text-align:center}
+.panel{background:#16213e;border-radius:12px;padding:20px;max-width:480px;width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+#board{display:grid;grid-template-columns:repeat(8,1fr);max-width:400px;margin:8px auto;border:2px solid #3a3a5a;user-select:none}
+.sq{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:clamp(24px,5vw,42px);cursor:default}
+.sq-light{background:#f0d9b5}
+.sq-dark{background:#b58863}
+.sq-w{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.sq-b{color:#1a1a1a;text-shadow:0 1px 2px rgba(255,255,255,.2)}
+.desc{font-size:.85rem;color:#7ec8e3;margin:8px 0;font-style:italic;padding:0 8px;min-height:2.2em}
+.position-info{font-size:.85rem;color:#aaa;margin:6px 0}
+.moves-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0}
+.move-btn{background:#2a2a4a;border:1px solid #3a3a5a;border-radius:8px;padding:10px 8px;color:#ddd;font-size:.95rem;cursor:pointer;transition:all .15s}
+.move-btn:hover{background:#3a3a6a;border-color:#5a5a8a;transform:translateY(-1px)}
+.move-btn.selected{background:#4c8bf5;border-color:#6aafff;color:#fff;box-shadow:0 0 12px rgba(76,139,245,.4)}
+#progress-bar{display:flex;gap:4px;justify-content:center;margin:6px 0;flex-wrap:wrap}
+.dot{width:24px;height:24px;border-radius:50%;background:#2a2a4a;border:2px solid #3a3a5a;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:#555}
+.dot.active{border-color:#4c8bf5;background:#2a2a5a;color:#4c8bf5}
+.dot.done{border-color:#5ec96a;background:#1a3a2a;color:#5ec96a}
+button.primary{background:linear-gradient(135deg,#4c8bf5,#6a5acd);border:none;color:#fff;padding:10px 24px;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s;margin-top:10px}
+button.primary:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(76,139,245,.4)}
+#next-btn{display:none}
+#loading{display:none;padding:40px;color:#888}
+.spinner{border:3px solid #2a2a4a;border-top:3px solid #4c8bf5;border-radius:50%;width:36px;height:36px;animation:spin .8s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+#result-panel{display:none}
+.band-result{background:linear-gradient(135deg,#1a1a3e,#2a1a4e);border-radius:12px;padding:18px;margin:10px 0}
+.band-name{font-size:1.3rem;font-weight:800;margin:6px 0}
+.rating-est{font-size:1rem;color:#f0c27f}
+.confidence{font-size:.8rem;color:#888;margin-top:3px}
+.prob-bar{height:8px;border-radius:4px;margin:3px 0;background:#2a2a4a;overflow:hidden}
+.prob-fill{height:100%;border-radius:4px}
+.prob-row{display:flex;justify-content:space-between;font-size:.78rem;margin:5px 0 1px}
+.prob-label{color:#aaa;text-align:left}
+.prob-pct{color:#ddd;font-weight:600}
+.band-Muy_inferior .band-name{color:#e74c3c}.band-Muy_inferior .prob-fill{background:#e74c3c}
+.band-Inferior .band-name{color:#e67e22}.band-Inferior .prob-fill{background:#e67e22}
+.band-Normal_bajo .band-name{color:#f1c40f}.band-Normal_bajo .prob-fill{background:#f1c40f}
+.band-Normal_alto .band-name{color:#2ecc71}.band-Normal_alto .prob-fill{background:#2ecc71}
+.band-Superior .band-name{color:#1abc9c}.band-Superior .prob-fill{background:#1abc9c}
+.band-Muy_superior .band-name{color:#3498db}.band-Muy_superior .prob-fill{background:#3498db}
+.band-Excepcional .band-name{color:#9b59b6}.band-Excepcional .prob-fill{background:#9b59b6}
+.restart-btn{background:#2a2a4a;border:1px solid #3a3a5a;color:#aaa;padding:8px 18px;border-radius:6px;cursor:pointer;margin-top:10px;font-size:.85rem}
+.restart-btn:hover{background:#3a3a5a;color:#ddd}
+footer{margin-top:16px;color:#555;font-size:.7rem;text-align:center;line-height:1.3}
+.err{color:#e74c3c;font-size:.85rem;padding:20px}
 </style>
 </head>
 <body>
 <h1>♟️ Elokinator</h1>
 <div class="subtitle">Elige la jugada que harías en cada posición<br>El modelo estimará tu banda de nivel</div>
-
 <div id="setup" class="panel">
-  <p style="margin-bottom:14px;color:#aaa;font-size:0.9rem;line-height:1.5;">
+  <p style="margin-bottom:14px;color:#aaa;font-size:.9rem;line-height:1.5;">
     Te mostraremos <strong>10 posiciones</strong> de apertura.<br>
     En cada una, elige la jugada que <em>tú</em> harías.<br>
     El modelo RandomForest (400 árboles) estimará tu nivel.
   </p>
-  <p style="font-size:0.75rem;color:#666;margin-bottom:14px;">
-    Entrenado con 1635 jugadores reales de Lichess blitz<br>
-    Inferencia 100% en el navegador · Sin servidor
+  <p style="font-size:.75rem;color:#666;margin-bottom:14px;">
+    Entrenado con 2418 jugadores reales de Lichess blitz<br>
+    Inferencia 100% en el navegador<br>
+    Precisión: 32% exacto / 68% ±1 banda / MAE 1.25
   </p>
   <button class="primary" id="start-btn">Comenzar test →</button>
 </div>
-
 <div id="game-area" class="panel" style="display:none;">
   <div id="progress-bar"></div>
   <div class="desc" id="position-desc"></div>
@@ -105,218 +80,34 @@
   <div id="moves-container" class="moves-grid"></div>
   <button class="primary" id="next-btn">Siguiente →</button>
 </div>
-
 <div id="loading">
   <div class="spinner"></div>
   <p>Cargando modelo...</p>
 </div>
-
 <div id="result-panel" class="panel">
-  <h2 style="font-size:1.1rem;margin-bottom:2px;">🎯 Tu nivel estimado</h2>
+  <h2 style="font-size:1.1rem;margin-bottom:2px;">Tu nivel estimado</h2>
   <p class="subtitle" style="margin-bottom:10px;">Basado en tus 10 jugadas</p>
   <div id="result-content"></div>
   <button class="restart-btn" onclick="location.reload()">Volver a empezar</button>
-  <footer>RandomForest 400 árboles · Prior: Lichess Blitz real<br>
+  <footer>RandomForest 400 árboles &middot; Prior: Lichess Blitz real<br>
   <a href="https://github.com/Paruski/Elokinator" style="color:#4c8bf5;">GitHub</a></footer>
 </div>
-
 <script>
-// ═════════════════════════════════════════════════════════════════════
-// DATA
-// ═════════════════════════════════════════════════════════════════════
-
-const BANDS = ["Muy_inferior","Inferior","Normal_bajo","Normal_alto","Superior","Muy_superior","Excepcional"];
-const BAND_NAMES = {"Muy_inferior":"Muy inferior (<700)","Inferior":"Inferior (700-1100)","Normal_bajo":"Normal bajo (1100-1500)","Normal_alto":"Normal alto (1500-1900)","Superior":"Superior (1900-2300)","Muy_superior":"Muy superior (2300-2650)","Excepcional":"Excepcional (2650+)"};
-const BAND_MIDPOINTS = [350, 900, 1300, 1700, 2100, 2475, 2700];
-const PIECES = {'wK':'♔','wQ':'♕','wR':'♖','wB':'♗','wN':'♘','wP':'♙','bK':'♚','bQ':'♛','bR':'♜','bB':'♝','bN':'♞','bP':'♟'};
-
-const POSITIONS = [
-  {"id":1,"turn":"white","fen":"rnbqkbnr/ppp2ppp/4p3/3p4/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3","description":"Gambito de Dama rehusado: 1.d4 d5 2.c4 e6","moves":{"b1c3":{"san":"Cc3","cp_loss":0.0},"g1f3":{"san":"Cf3","cp_loss":0.0},"c4d5":{"san":"cxd5","cp_loss":0.0},"e2e3":{"san":"e3","cp_loss":32.5},"c1f4":{"san":"Af4","cp_loss":54.0}}},
-  {"id":2,"turn":"white","fen":"rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2","description":"Apertura abierta: 1.e4 e5","moves":{"g1f3":{"san":"Cf3","cp_loss":0.0},"f1c4":{"san":"Ac4","cp_loss":22.2},"b1c3":{"san":"Cc3","cp_loss":21.0},"d1h5":{"san":"Dh5","cp_loss":41.3},"d2d3":{"san":"d3","cp_loss":32.5},"f1d3":{"san":"Ad3","cp_loss":40.2},"f1b5":{"san":"Ab5","cp_loss":0.0},"e4e5":{"san":"e5","cp_loss":73.5},"d2d4":{"san":"d4","cp_loss":20.3},"g2g3":{"san":"g3","cp_loss":33.4},"b2b3":{"san":"b3","cp_loss":33.2},"c2c4":{"san":"c4","cp_loss":41.2},"c2c3":{"san":"c3","cp_loss":36.1},"a2a3":{"san":"a3","cp_loss":63.0},"h2h3":{"san":"h3","cp_loss":55.6},"f2f4":{"san":"f4","cp_loss":87.6},"b1a3":{"san":"Ca3","cp_loss":60.0}}},
-  {"id":3,"turn":"white","fen":"rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2","description":"Defensa Alekhine: 1.e4 Cf6","moves":{"e4e5":{"san":"e5","cp_loss":0.0},"b1c3":{"san":"Cc3","cp_loss":0.0},"g1f3":{"san":"Cf3","cp_loss":35.4},"f1d3":{"san":"Ad3","cp_loss":47.7},"f1b5":{"san":"Ab5","cp_loss":96.5},"d2d4":{"san":"d4","cp_loss":46.6},"d2d3":{"san":"d3","cp_loss":91.0}}},
-  {"id":4,"turn":"white","fen":"rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2","description":"Defensa Siciliana: 1.e4 c5","moves":{"g1f3":{"san":"Cf3","cp_loss":18.3},"b1c3":{"san":"Cc3","cp_loss":0.0},"f1c4":{"san":"Ac4","cp_loss":20.1},"c2c3":{"san":"c3","cp_loss":23.8},"d2d4":{"san":"d4","cp_loss":33.8},"d2d3":{"san":"d3","cp_loss":21.4},"f1b5":{"san":"Ab5","cp_loss":43.0},"b2b4":{"san":"b4","cp_loss":112.7},"c2c4":{"san":"c4","cp_loss":52.6},"e4e5":{"san":"e5","cp_loss":109.4},"a2a3":{"san":"a3","cp_loss":42.1},"g2g3":{"san":"g3","cp_loss":59.0},"f2f4":{"san":"f4","cp_loss":79.9},"h2h3":{"san":"h3","cp_loss":62.2}}},
-  {"id":5,"turn":"white","fen":"rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2","description":"Defensa India de Rey: 1.d4 Cf6","moves":{"c2c4":{"san":"c4","cp_loss":0.0},"g1f3":{"san":"Cf3","cp_loss":0.0},"c1f4":{"san":"Af4","cp_loss":27.3},"b1c3":{"san":"Cc3","cp_loss":25.1},"e2e3":{"san":"e3","cp_loss":20.6},"b1d2":{"san":"Cd2","cp_loss":30.6},"e2e4":{"san":"e4","cp_loss":0.0},"c1g5":{"san":"Ag5","cp_loss":40.0},"g1h3":{"san":"Ch3","cp_loss":62.4},"c1d2":{"san":"Ad2","cp_loss":62.4},"a2a3":{"san":"a3","cp_loss":47.0},"f2f3":{"san":"f3","cp_loss":72.6}}},
-  {"id":6,"turn":"white","fen":"rnbqkbnr/ppp1pppp/3p4/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2","description":"Apertura 1.d4 d6 — posición poco común","moves":{"g1f3":{"san":"Cf3","cp_loss":0.0},"c2c4":{"san":"c4","cp_loss":0.0},"c1f4":{"san":"Af4","cp_loss":37.7},"e2e3":{"san":"e3","cp_loss":31.4},"e2e4":{"san":"e4","cp_loss":18.5},"b1c3":{"san":"Cc3","cp_loss":0.0},"b1d2":{"san":"Cd2","cp_loss":31.1}}},
-  {"id":7,"turn":"white","fen":"rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2","description":"Defensa Francesa: 1.e4 e6","moves":{"d2d4":{"san":"d4","cp_loss":0.0},"g1f3":{"san":"Cf3","cp_loss":0.0},"b1c3":{"san":"Cc3","cp_loss":28.8},"f1c4":{"san":"Ac4","cp_loss":25.0},"d2d3":{"san":"d3","cp_loss":30.6},"f1d3":{"san":"Ad3","cp_loss":37.5},"e4e5":{"san":"e5","cp_loss":17.4},"c2c4":{"san":"c4","cp_loss":32.6},"b2b3":{"san":"b3","cp_loss":65.0},"c2c3":{"san":"c3","cp_loss":37.7},"g2g3":{"san":"g3","cp_loss":22.3},"f2f4":{"san":"f4","cp_loss":39.3}}},
-  {"id":8,"turn":"white","fen":"rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2","description":"Defensa Caro-Kann: 1.e4 c6","moves":{"d2d4":{"san":"d4","cp_loss":0.0},"g1f3":{"san":"Cf3","cp_loss":12.2},"b1c3":{"san":"Cc3","cp_loss":0.0},"f1c4":{"san":"Ac4","cp_loss":15.0},"d2d3":{"san":"d3","cp_loss":24.2},"c2c4":{"san":"c4","cp_loss":21.5},"f1d3":{"san":"Ad3","cp_loss":39.1},"c2c3":{"san":"c3","cp_loss":7.0},"b2b3":{"san":"b3","cp_loss":32.5},"e4e5":{"san":"e5","cp_loss":29.3},"f2f4":{"san":"f4","cp_loss":41.4}}},
-  {"id":9,"turn":"white","fen":"rnbqkbnr/pp1p1ppp/4p3/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3","description":"Siciliana: 1.e4 c5 2.Cf3 — continuación principal","moves":{"d2d4":{"san":"d4","cp_loss":0.0},"c2c4":{"san":"c4","cp_loss":0.0},"b1c3":{"san":"Cc3","cp_loss":53.5},"f1c4":{"san":"Ac4","cp_loss":44.5},"c2c3":{"san":"c3","cp_loss":60.6},"f1b5":{"san":"Ab5","cp_loss":101.9},"d2d3":{"san":"d3","cp_loss":60.6},"b2b3":{"san":"b3","cp_loss":61.7},"g2g3":{"san":"g3","cp_loss":130.0}}},
-  {"id":10,"turn":"white","fen":"r1bqkbnr/pp1ppppp/2n5/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3","description":"Siciliana: 1.e4 c5 2.Cf3 Cc6 — rama clásica","moves":{"d2d4":{"san":"d4","cp_loss":3.4},"f1b5":{"san":"Ab5","cp_loss":0.0},"b1c3":{"san":"Cc3","cp_loss":17.8},"c2c3":{"san":"c3","cp_loss":32.5},"f1c4":{"san":"Ac4","cp_loss":37.3},"d2d3":{"san":"d3","cp_loss":20.4},"b2b3":{"san":"b3","cp_loss":20.6},"g2g3":{"san":"g3","cp_loss":49.7}}}
-];
-
-// ═════════════════════════════════════════════════════════════════════
-// RANDOM FOREST INFERENCE ENGINE
-// ═════════════════════════════════════════════════════════════════════
-
-function predictRF(features, modelJson) {
-  const nc = modelJson.nc, ne = modelJson.ne;
-  const sc = modelJson.sc;
-  const x = features.map((v, i) => (v - sc.m[i]) / sc.s[i]);
-  const sumProbs = new Array(nc).fill(0);
-  for (let t = 0; t < ne; t++) {
-    const tr = modelJson.trees[t];
-    let node = 0;
-    while (tr.nl[node] !== -1) {
-      if (x[tr.f[node]] <= tr.t[node]) { node = tr.nl[node]; }
-      else { node = tr.nr[node]; }
-    }
-    for (let c = 0; c < nc; c++) { sumProbs[c] += tr.p[node][c]; }
-  }
-  return sumProbs.map(v => v / ne);
-}
-
-function posteriorAdjust(probs, prior, alpha) {
-  if (alpha <= 0) return probs;
-  const logPost = probs.map((p, i) => (1 - alpha) * Math.log(p + 1e-10) + alpha * Math.log(prior[i] + 1e-10));
-  const maxLP = Math.max(...logPost);
-  const expPost = logPost.map(v => Math.exp(v - maxLP));
-  return expPost.map(v => v / expPost.reduce((a, b) => a + b, 0));
-}
-
-// ═════════════════════════════════════════════════════════════════════
-// BOARD RENDERER
-// ═════════════════════════════════════════════════════════════════════
-
-function renderBoard(fen) {
-  const el = document.getElementById('board');
-  const rows = fen.split(' ')[0].split('/');
-  el.innerHTML = '';
-  for (let r = 0; r < 8; r++) {
-    let row = rows[r], col = 0;
-    for (let c = 0; c < row.length; c++) {
-      const ch = row[c];
-      if (ch >= '1' && ch <= '8') {
-        for (let e = 0; e < parseInt(ch); e++) {
-          const sq = document.createElement('div');
-          sq.className = 'sq ' + ((r + col) % 2 === 0 ? 'sq-light' : 'sq-dark');
-          el.appendChild(sq); col++;
-        }
-      } else {
-        const sq = document.createElement('div');
-        const pColor = ch === ch.toUpperCase() ? 'w' : 'b';
-        sq.className = 'sq ' + ((r + col) % 2 === 0 ? 'sq-light' : 'sq-dark') + ' sq-' + pColor;
-        sq.textContent = PIECES[pColor + ch.toUpperCase()] || ch;
-        el.appendChild(sq); col++;
-      }
-    }
-  }
-}
-
-// ═════════════════════════════════════════════════════════════════════
-// APP STATE
-// ═════════════════════════════════════════════════════════════════════
-
-let model = null;
-let currentPos = 0;
-let selectedMoves = {};
-
-function updateProgress() {
-  const bar = document.getElementById('progress-bar');
-  bar.innerHTML = POSITIONS.map((p, i) => {
-    let cls = 'dot';
-    if (i === currentPos) cls += ' active';
-    else if (selectedMoves[p.id]) cls += ' done';
-    return '<div class="' + cls + '">' + (i+1) + '</div>';
-  }).join('');
-}
-
-function renderMoves() {
-  const pos = POSITIONS[currentPos];
-  const container = document.getElementById('moves-container');
-  container.innerHTML = '';
-  const entries = Object.entries(pos.moves).sort((a, b) => a[1].san.localeCompare(b[1].san));
-  for (const [uci, info] of entries) {
-    const btn = document.createElement('button');
-    btn.className = 'move-btn';
-    if (selectedMoves[pos.id] === uci) btn.classList.add('selected');
-    btn.textContent = info.san;
-    btn.onclick = function() { selectMove(pos.id, uci); };
-    container.appendChild(btn);
-  }
-}
-
-function selectMove(posId, uci) {
-  selectedMoves[posId] = uci;
-  renderMoves();
-  updateProgress();
-  document.getElementById('next-btn').style.display = 'inline-block';
-}
-
-function showPosition() {
-  if (currentPos >= POSITIONS.length) { submitResults(); return; }
-  const pos = POSITIONS[currentPos];
-  document.getElementById('position-info').textContent = 'Posici\u00f3n ' + (currentPos+1) + ' de ' + POSITIONS.length;
-  document.getElementById('position-desc').textContent = pos.description || '';
-  renderBoard(pos.fen);
-  renderMoves();
-  updateProgress();
-  document.getElementById('next-btn').style.display = selectedMoves[pos.id] ? 'inline-block' : 'none';
-}
-
-function submitResults() {
-  document.getElementById('game-area').style.display = 'none';
-  document.getElementById('loading').innerHTML = '<div class="spinner"></div><p>Analizando tus respuestas...</p>';
-  document.getElementById('loading').style.display = 'block';
-
-  setTimeout(function() {
-    const feats = [];
-    for (let pid = 1; pid <= 10; pid++) {
-      const uci = selectedMoves[pid];
-      const pos = POSITIONS.find(function(p) { return p.id === pid; });
-      if (uci && pos && pos.moves[uci]) { feats.push(pos.moves[uci].cp_loss); }
-      else { feats.push(15.0); }
-    }
-    const rawProbs = predictRF(feats, model);
-    const adjProbs = posteriorAdjust(rawProbs, model.pr, model.al);
-    const predClass = adjProbs.indexOf(Math.max.apply(null, adjProbs));
-    const predBand = BANDS[predClass];
-    const confidence = adjProbs[predClass];
-    const expectedRating = Math.round(adjProbs.reduce(function(s, p, i) { return s + p * BAND_MIDPOINTS[i]; }, 0));
-    const meanCp = feats.filter(function(f) { return f !== 15.0; }).reduce(function(s, v) { return s + v; }, 0) / Math.max(1, feats.filter(function(f) { return f !== 15.0; }).length);
-
-    showResults(predBand, expectedRating, confidence, adjProbs, meanCp);
-  }, 400);
-}
-
-function showResults(band, rating, confidence, probs, meanCp) {
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('result-panel').style.display = 'block';
-  var probHtml = '';
-  for (var i = 0; i < BANDS.length; i++) {
-    var b = BANDS[i];
-    var pct = (probs[i] * 100).toFixed(1);
-    probHtml += '<div class="prob-row"><span class="prob-label">' + BAND_NAMES[b] + '</span><span class="prob-pct">' + pct + '%</span></div><div class="prob-bar"><div class="prob-fill" style="width:' + Math.max(pct, 1) + '%"></div></div>';
-  }
-  document.getElementById('result-content').innerHTML =
-    '<div class="band-result band-' + band + '"><div style="font-size:0.85rem;color:#888;">Tu banda estimada</div><div class="band-name" style="font-size:1.5rem;">' + BAND_NAMES[band] + '</div><div class="rating-est">Rating estimado: ~' + rating + ' Elo</div><div class="confidence">Confianza: ' + (confidence * 100).toFixed(0) + '% · CP loss medio: ' + meanCp.toFixed(1) + ' cp</div></div><div style="margin-top:14px;font-size:0.85rem;color:#aaa;text-align:left;"><strong>Distribuci\u00f3n de probabilidad:</strong></div>' + probHtml;
-}
-
-// ═════════════════════════════════════════════════════════════════════
-// START
-// ═════════════════════════════════════════════════════════════════════
-
-document.getElementById('start-btn').onclick = function() {
-  document.getElementById('setup').style.display = 'none';
-  document.getElementById('loading').style.display = 'block';
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', 'model.json', true);
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      model = JSON.parse(xhr.responseText);
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('game-area').style.display = 'block';
-      currentPos = 0;
-      showPosition();
-    } else {
-      document.getElementById('loading').innerHTML = '<p class="err">Error al cargar modelo: HTTP ' + xhr.status + '</p><button class="restart-btn" onclick="location.reload()">Reintentar</button>';
-    }
-  };
-  xhr.onerror = function() {
-    document.getElementById('loading').innerHTML = '<p class="err">Error de red al cargar modelo</p><button class="restart-btn" onclick="location.reload()">Reintentar</button>';
-  };
-  xhr.send();
-};
-
-document.getElementById('next-btn').onclick = function() { currentPos++; showPosition(); };
+var BANDS = ["Muy_inferior", "Inferior", "Normal_bajo", "Normal_alto", "Superior", "Muy_superior", "Excepcional"];
+var BAND_NAMES = {"Muy_inferior": "Muy inferior (<700)", "Inferior": "Inferior (700-1100)", "Normal_bajo": "Normal bajo (1100-1500)", "Normal_alto": "Normal alto (1500-1900)", "Superior": "Superior (1900-2300)", "Muy_superior": "Muy superior (2300-2650)", "Excepcional": "Excepcional (2650+)"};
+var BAND_MIDPOINTS = [350, 900, 1300, 1700, 2100, 2475, 2700];
+var PIECES = {wK:"♔",wQ:"♕",wR:"♖",wB:"♗",wN:"♘",wP:"♙",bK:"♚",bQ:"♛",bR:"♜",bB:"♝",bN:"♞",bP:"♟"};
+var POSITIONS = [{"id": 1, "turn": "white", "fen": "rnbqkbnr/ppp2ppp/4p3/3p4/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3", "description": "Gambito de Dama rehusado: 1.d4 d5 2.c4 e6", "moves": {"b1c3": {"san": "Cc3", "cp_loss": 0.0}, "g1f3": {"san": "Cf3", "cp_loss": 0.0}, "c4d5": {"san": "cxd5", "cp_loss": 0.0}, "e2e3": {"san": "e3", "cp_loss": 32.5}, "c1f4": {"san": "Af4", "cp_loss": 54.0}}}, {"id": 2, "turn": "white", "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2", "description": "Apertura abierta: 1.e4 e5", "moves": {"g1f3": {"san": "Cf3", "cp_loss": 0.0}, "f1c4": {"san": "Ac4", "cp_loss": 22.2}, "b1c3": {"san": "Cc3", "cp_loss": 21.0}, "d1h5": {"san": "Dh5", "cp_loss": 41.3}, "d2d3": {"san": "d3", "cp_loss": 32.5}, "f1d3": {"san": "Ad3", "cp_loss": 40.2}, "f1b5": {"san": "Ab5", "cp_loss": 0.0}, "e4e5": {"san": "e5", "cp_loss": 73.5}, "d2d4": {"san": "d4", "cp_loss": 20.3}, "g2g3": {"san": "g3", "cp_loss": 33.4}, "b2b3": {"san": "b3", "cp_loss": 33.2}, "c2c4": {"san": "c4", "cp_loss": 41.2}, "c2c3": {"san": "c3", "cp_loss": 36.1}, "a2a3": {"san": "a3", "cp_loss": 63.0}, "h2h3": {"san": "h3", "cp_loss": 55.6}, "f2f4": {"san": "f4", "cp_loss": 87.6}, "b1a3": {"san": "Ca3", "cp_loss": 60.0}}}, {"id": 3, "turn": "white", "fen": "rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2", "description": "Defensa Alekhine: 1.e4 Cf6", "moves": {"e4e5": {"san": "e5", "cp_loss": 0.0}, "b1c3": {"san": "Cc3", "cp_loss": 0.0}, "g1f3": {"san": "Cf3", "cp_loss": 35.4}, "f1d3": {"san": "Ad3", "cp_loss": 47.7}, "f1b5": {"san": "Ab5", "cp_loss": 96.5}, "d2d4": {"san": "d4", "cp_loss": 46.6}, "d2d3": {"san": "d3", "cp_loss": 91.0}}}, {"id": 4, "turn": "white", "fen": "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2", "description": "Defensa Siciliana: 1.e4 c5", "moves": {"g1f3": {"san": "Cf3", "cp_loss": 18.3}, "b1c3": {"san": "Cc3", "cp_loss": 0.0}, "f1c4": {"san": "Ac4", "cp_loss": 20.1}, "c2c3": {"san": "c3", "cp_loss": 23.8}, "d2d4": {"san": "d4", "cp_loss": 33.8}, "d2d3": {"san": "d3", "cp_loss": 21.4}, "f1b5": {"san": "Ab5", "cp_loss": 43.0}, "b2b4": {"san": "b4", "cp_loss": 112.7}, "c2c4": {"san": "c4", "cp_loss": 52.6}, "e4e5": {"san": "e5", "cp_loss": 109.4}, "a2a3": {"san": "a3", "cp_loss": 42.1}, "g2g3": {"san": "g3", "cp_loss": 59.0}, "f2f4": {"san": "f4", "cp_loss": 79.9}, "h2h3": {"san": "h3", "cp_loss": 62.2}}}, {"id": 5, "turn": "white", "fen": "rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2", "description": "Defensa India de Rey: 1.d4 Cf6", "moves": {"c2c4": {"san": "c4", "cp_loss": 0.0}, "g1f3": {"san": "Cf3", "cp_loss": 0.0}, "c1f4": {"san": "Af4", "cp_loss": 27.3}, "b1c3": {"san": "Cc3", "cp_loss": 25.1}, "e2e3": {"san": "e3", "cp_loss": 20.6}, "b1d2": {"san": "Cd2", "cp_loss": 30.6}, "e2e4": {"san": "e4", "cp_loss": 0.0}, "c1g5": {"san": "Ag5", "cp_loss": 40.0}, "g1h3": {"san": "Ch3", "cp_loss": 62.4}, "c1d2": {"san": "Ad2", "cp_loss": 62.4}, "a2a3": {"san": "a3", "cp_loss": 47.0}, "f2f3": {"san": "f3", "cp_loss": 72.6}}}, {"id": 6, "turn": "white", "fen": "rnbqkbnr/ppp1pppp/3p4/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2", "description": "Apertura 1.d4 d6 - posicion poco comun", "moves": {"g1f3": {"san": "Cf3", "cp_loss": 0.0}, "c2c4": {"san": "c4", "cp_loss": 0.0}, "c1f4": {"san": "Af4", "cp_loss": 37.7}, "e2e3": {"san": "e3", "cp_loss": 31.4}, "e2e4": {"san": "e4", "cp_loss": 18.5}, "b1c3": {"san": "Cc3", "cp_loss": 0.0}, "b1d2": {"san": "Cd2", "cp_loss": 31.1}}}, {"id": 7, "turn": "white", "fen": "rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2", "description": "Defensa Francesa: 1.e4 e6", "moves": {"d2d4": {"san": "d4", "cp_loss": 0.0}, "g1f3": {"san": "Cf3", "cp_loss": 0.0}, "b1c3": {"san": "Cc3", "cp_loss": 28.8}, "f1c4": {"san": "Ac4", "cp_loss": 25.0}, "d2d3": {"san": "d3", "cp_loss": 30.6}, "f1d3": {"san": "Ad3", "cp_loss": 37.5}, "e4e5": {"san": "e5", "cp_loss": 17.4}, "c2c4": {"san": "c4", "cp_loss": 32.6}, "b2b3": {"san": "b3", "cp_loss": 65.0}, "c2c3": {"san": "c3", "cp_loss": 37.7}, "g2g3": {"san": "g3", "cp_loss": 22.3}, "f2f4": {"san": "f4", "cp_loss": 39.3}}}, {"id": 8, "turn": "white", "fen": "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2", "description": "Defensa Caro-Kann: 1.e4 c6", "moves": {"d2d4": {"san": "d4", "cp_loss": 0.0}, "g1f3": {"san": "Cf3", "cp_loss": 12.2}, "b1c3": {"san": "Cc3", "cp_loss": 0.0}, "f1c4": {"san": "Ac4", "cp_loss": 15.0}, "d2d3": {"san": "d3", "cp_loss": 24.2}, "c2c4": {"san": "c4", "cp_loss": 21.5}, "f1d3": {"san": "Ad3", "cp_loss": 39.1}, "c2c3": {"san": "c3", "cp_loss": 7.0}, "b2b3": {"san": "b3", "cp_loss": 32.5}, "e4e5": {"san": "e5", "cp_loss": 29.3}, "f2f4": {"san": "f4", "cp_loss": 41.4}}}, {"id": 9, "turn": "white", "fen": "rnbqkbnr/pp1p1ppp/4p3/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3", "description": "Siciliana: 1.e4 c5 2.Cf3 - continuacion principal", "moves": {"d2d4": {"san": "d4", "cp_loss": 0.0}, "c2c4": {"san": "c4", "cp_loss": 0.0}, "b1c3": {"san": "Cc3", "cp_loss": 53.5}, "f1c4": {"san": "Ac4", "cp_loss": 44.5}, "c2c3": {"san": "c3", "cp_loss": 60.6}, "f1b5": {"san": "Ab5", "cp_loss": 101.9}, "d2d3": {"san": "d3", "cp_loss": 60.6}, "b2b3": {"san": "b3", "cp_loss": 61.7}, "g2g3": {"san": "g3", "cp_loss": 130.0}}}, {"id": 10, "turn": "white", "fen": "r1bqkbnr/pp1ppppp/2n5/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3", "description": "Siciliana: 1.e4 c5 2.Cf3 Cc6 - rama clasica", "moves": {"d2d4": {"san": "d4", "cp_loss": 3.4}, "f1b5": {"san": "Ab5", "cp_loss": 0.0}, "b1c3": {"san": "Cc3", "cp_loss": 17.8}, "c2c3": {"san": "c3", "cp_loss": 32.5}, "f1c4": {"san": "Ac4", "cp_loss": 37.3}, "d2d3": {"san": "d3", "cp_loss": 20.4}, "b2b3": {"san": "b3", "cp_loss": 20.6}, "g2g3": {"san": "g3", "cp_loss": 49.7}}}];
+function predictRF(features,m){var nc=m.nc,ne=m.ne,sc=m.sc;var x=features.map(function(v,i){return (v-sc.m[i])/sc.s[i];});var sp=new Array(nc);for(var c=0;c<nc;c++)sp[c]=0;for(var t=0;t<ne;t++){var tr=m.trees[t];var node=0;while(tr.nl[node]!==-1){if(x[tr.f[node]]<=tr.t[node]){node=tr.nl[node];}else{node=tr.nr[node];}}for(var c=0;c<nc;c++){sp[c]+=tr.p[node][c];}}return sp.map(function(v){return v/ne;});}
+function renderBoard(fen){var el=document.getElementById("board");var rows=fen.split(" ")[0].split("/");el.innerHTML="";for(var r=0;r<8;r++){var row=rows[r];var col=0;for(var c=0;c<row.length;c++){var ch=row[c];if(ch>="1"&&ch<="8"){for(var e=0;e<parseInt(ch);e++){var sq=document.createElement("div");sq.className="sq "+((r+col)%2===0?"sq-light":"sq-dark");el.appendChild(sq);col++;}}else{var sq=document.createElement("div");var pColor=ch===ch.toUpperCase()?"w":"b";sq.className="sq "+((r+col)%2===0?"sq-light":"sq-dark")+" sq-"+pColor;sq.textContent=PIECES[pColor+ch.toUpperCase()]||ch;el.appendChild(sq);col++;}}}}}
+var model=null,currentPos=0,selectedMoves={};
+function updateProgress(){var bar=document.getElementById("progress-bar");bar.innerHTML=POSITIONS.map(function(p,i){var cls="dot";if(i===currentPos)cls+=" active";else if(selectedMoves[p.id])cls+=" done";return '<div class="'+cls+'">'+(i+1)+'</div>';}).join("");}
+function renderMoves(){var pos=POSITIONS[currentPos];var container=document.getElementById("moves-container");container.innerHTML="";var entries=Object.entries(pos.moves).sort(function(a,b){return a[1].san.localeCompare(b[1].san);});for(var i=0;i<entries.length;i++){var uci=entries[i][0],info=entries[i][1];var btn=document.createElement("button");btn.className="move-btn";if(selectedMoves[pos.id]===uci)btn.classList.add("selected");btn.textContent=info.san;btn.onclick=(function(u){return function(){selectMove(pos.id,u);};})(uci);container.appendChild(btn);}}
+function selectMove(posId,uci){selectedMoves[posId]=uci;renderMoves();updateProgress();document.getElementById("next-btn").style.display="inline-block";}
+function showPosition(){if(currentPos>=POSITIONS.length){submitResults();return;}var pos=POSITIONS[currentPos];document.getElementById("position-info").textContent="Posición "+(currentPos+1)+" de "+POSITIONS.length;document.getElementById("position-desc").textContent=pos.description||"";renderBoard(pos.fen);renderMoves();updateProgress();document.getElementById("next-btn").style.display=selectedMoves[pos.id]?"inline-block":"none";}
+function submitResults(){document.getElementById("game-area").style.display="none";document.getElementById("loading").innerHTML='<div class="spinner"></div><p>Analizando tus respuestas...</p>';document.getElementById("loading").style.display="block";setTimeout(function(){var feats=[];for(var pid=1;pid<=10;pid++){var uci=selectedMoves[pid];var pos=null;for(var j=0;j<POSITIONS.length;j++){if(POSITIONS[j].id===pid){pos=POSITIONS[j];break;}}if(uci&&pos&&pos.moves[uci]){feats.push(pos.moves[uci].cp_loss);}else{feats.push(15.0);}}var probs=predictRF(feats,model);var predClass=0;var maxVal=probs[0];for(var j=1;j<probs.length;j++){if(probs[j]>maxVal){maxVal=probs[j];predClass=j;}}var band=BANDS[predClass],conf=probs[predClass];var rating=0;for(var j=0;j<probs.length;j++){rating+=probs[j]*BAND_MIDPOINTS[j];}rating=Math.round(rating);var cps=[];for(var j=0;j<feats.length;j++){if(feats[j]!==15.0)cps.push(feats[j]);}var meanCp=cps.length>0?cps.reduce(function(s,v){return s+v;},0)/cps.length:0;var el=document.getElementById("result-content");var rhtml='<div class="band-result band-'+band+'"><div style="font-size:0.85rem;color:#888;">Tu banda estimada</div><div class="band-name" style="font-size:1.5rem;">'+BAND_NAMES[band]+'</div><div class="rating-est">Rating estimado: ~'+rating+' Elo</div><div class="confidence">Confianza: '+(conf*100).toFixed(0)+'% &middot; CP loss medio: '+meanCp.toFixed(1)+' cp</div></div><div style="margin-top:14px;font-size:0.85rem;color:#aaa;text-align:left;"><strong>Distribución de probabilidad:</strong></div>';for(var i=0;i<BANDS.length;i++){var b=BANDS[i];var pct=(probs[i]*100).toFixed(1);rhtml+='<div class="prob-row"><span class="prob-label">'+BAND_NAMES[b]+'</span><span class="prob-pct">'+pct+'%</span></div><div class="prob-bar"><div class="prob-fill" style="width:'+Math.max(pct,1)+'%"></div></div>';}el.innerHTML=rhtml;document.getElementById("loading").style.display="none";document.getElementById("result-panel").style.display="block";},400);}
+document.getElementById("start-btn").onclick=function(){document.getElementById("setup").style.display="none";document.getElementById("loading").style.display="block";var xhr=new XMLHttpRequest();xhr.open("GET","model.json",true);xhr.onload=function(){if(xhr.status===200){model=JSON.parse(xhr.responseText);document.getElementById("loading").style.display="none";document.getElementById("game-area").style.display="block";currentPos=0;showPosition();}else{document.getElementById("loading").innerHTML='<p class="err">Error al cargar modelo: HTTP '+xhr.status+'</p><button class="restart-btn" onclick="location.reload()">Reintentar</button>';}};xhr.onerror=function(){document.getElementById("loading").innerHTML='<p class="err">Error de red al cargar modelo</p><button class="restart-btn" onclick="location.reload()">Reintentar</button>';};xhr.send();};
+document.getElementById("next-btn").onclick=function(){currentPos++;showPosition();};
 </script>
 </body>
 </html>
